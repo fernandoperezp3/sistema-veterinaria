@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block page_title %}{{ titulo }}{% endblock %}
+{% block page_subtitle %}Datos del cliente{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="panel-card">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include 'partials/form_errors.html' %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nombres <span class="text-danger">*</span></label>
+            {{ form.nombres }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Apellidos <span class="text-danger">*</span></label>
+            {{ form.apellidos }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">DNI / Documento <span class="text-danger">*</span></label>
+            {{ form.dni }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Telefono <span class="text-danger">*</span></label>
+            {{ form.telefono }}
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Email</label>
+            {{ form.email }}
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Direccion</label>
+            {{ form.direccion }}
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary rounded-pill px-4" style="background:#0bb8c8;border:none;">
+            <i class="fa-solid fa-floppy-disk me-2"></i>{{ accion }}
+          </button>
+          <a href="{% url 'cliente_lista' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
