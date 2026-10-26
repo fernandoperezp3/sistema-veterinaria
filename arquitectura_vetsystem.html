@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitectura Tecnológica - Sistema Veterinario "VetSystem"</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --c-blue: #3b82f6;
+            --c-emerald: #10b981;
+            --c-indigo: #6366f1;
+            --c-purple: #d946ef;
+            --c-amber: #f59e0b;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+        }
+        body {
+            background-color: var(--bg-canvas);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+        }
+        .header-bar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 24px 32px;
+            border-bottom: 4px solid var(--c-blue);
+        }
+        .tier-column {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .tier-column:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .tier-header {
+            padding: 16px 20px;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tier-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .card-component {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            position: relative;
+        }
+        .card-component h6 {
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-component .tech-badge {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .card-component ul {
+            margin: 8px 0 0 0;
+            padding-left: 18px;
+            font-size: 0.84rem;
+            color: #334155;
+        }
+        .card-component ul li {
+            margin-bottom: 3px;
+        }
+        .tier-1 { border-color: #bfdbfe; }
+        .tier-1 .tier-header { background: #2563eb; }
+        .tier-2 { border-color: #a7f3d0; }
+        .tier-2 .tier-header { background: #059669; }
+        .tier-3 { border-color: #c7d2fe; }
+        .tier-3 .tier-header { background: #4f46e5; }
+        .tier-4 { border-color: #f5d0fe; }
+        .tier-4 .tier-header { background: #c026d3; }
+        .tier-5 { border-color: #fde68a; }
+        .tier-5 .tier-header { background: #d97706; }
+
+        .lifecycle-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-top: 30px;
+        }
+        .step-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            height: 100%;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .step-circle {
+            background: #2563eb;
+            color: white;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .step-content h6 {
+            margin: 0 0 4px 0;
+            font-weight: 700;
+            font-size: 0.88rem;
+        }
+        .step-content p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #64748b;
+            line-height: 1.35;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .tier-column { box-shadow: none; border: 1px solid #cbd5e1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-bar d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h2 class="mb-1 fw-bold"><i class="fa-solid fa-network-wired text-info me-2"></i> Arquitectura Tecnológica Web - VetSystem</h2>
+            <p class="mb-0 text-secondary" style="font-size: 0.95rem;">
+                Diagrama de Componentes, Microservicios Propuestos y Flujo de Comunicación E2E (12 Pasos)
+            </p>
+        </div>
+        <div class="no-print mt-2 mt-md-0 d-flex gap-2">
+            <a href="arquitectura_vetsystem.pdf" download class="btn btn-danger btn-sm px-3 fw-semibold">
+                <i class="fa-solid fa-file-pdf me-1"></i> Descargar PDF
+            </a>
+            <a href="arquitectura_vetsystem.png" download class="btn btn-primary btn-sm px-3 fw-semibold">
+                <i class="fa-solid fa-image me-1"></i> Descargar PNG
+            </a>
+            <a href="arquitectura_vetsystem.drawio" download class="btn btn-warning btn-sm px-3 fw-semibold text-dark">
+                <i class="fa-solid fa-project-diagram me-1"></i> Archivo Draw.io
+            </a>
+            <button onclick="window.print()" class="btn btn-outline-light btn-sm px-3">
+                <i class="fa-solid fa-print me-1"></i> Imprimir
+            </button>
+        </div>
+    </header>
+
+    <div class="container-fluid px-4 py-4">
+
+        <div class="row g-3">
+            
+            <!-- Columna 1: Cliente / Frontend -->
+            <div class="col-12 col-xl">
+                <div class="tier-column tier-1">
+                    <div class="tier-header">
+                        <i class="fa-solid fa-desktop"></i> 1. Capa Cliente
+                    </div>
+                    <div class="tier-body">
+                        <div class="card-component">
+                            <h6>Navegador Web <span class="tech-badge bg-primary text-white">Browser</span></h6>
+                            <div class="text-muted small">Dispositivos: PC Clínica / Tablet / Móvil</div>
+                            <ul>
+                                <li>Petición: <code>https://vetsystem.com</code></li>
+                                <li>Roles: Veterinario, Recepción, Admin</li>
+                                <li>Renderizado MVT / AJAX Dinámico</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Tecnologías Frontend <span class="tech-badge bg-secondary text-white">Stack</span></h6>
+                            <ul>
+                                <li><strong>HTML5 Semántico</strong> + CSS3</li>
+                                <li><strong>Bootstrap 5</strong> (CSS Framework)</li>
+                                <li><strong>JavaScript Vanilla</strong> (Fetch API)</li>
+                                <li><strong>Chart.js</strong> (Métricas clínicas)</li>
+                                <li><strong>FontAwesome 6</strong> (Iconografía)</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Vistas de Usuario <span class="tech-badge bg-info text-dark">UI</span></h6>
+                            <ul>
+                                <li>Agenda y Calendario de Citas</li>
+                                <li>Ficha Clínica y Vacunación</li>
+                                <li>Kárdex y Venta de Fármacos</li>
+                                <li>Comprobantes y Cierre de Caja</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 2: Red, Edge & Proxy -->
+            <div class="col-12 col-xl">
+                <div class="tier-column tier-2">
+                    <div class="tier-header">
+                        <i class="fa-solid fa-shield-halved"></i> 2. Red & Proxy
+                    </div>
+                    <div class="tier-body">
+                        <div class="card-component">
+                            <h6>DNS & CDN <span class="tech-badge bg-success text-white">Cloudflare</span></h6>
+                            <ul>
+                                <li>Resolución DNS de dominio a IP pública</li>
+                                <li>Terminación SSL/TLS (HTTPS Puerto 443)</li>
+                                <li>Mitigación DDoS y Web Application Firewall</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Servidor Nginx 1.24 <span class="tech-badge bg-dark text-white">Proxy Inverso</span></h6>
+                            <ul>
+                                <li><strong>/static/ y /media/:</strong> Servidos directos</li>
+                                <li><strong>proxy_pass:</strong> Envío a Gunicorn (WSGI)</li>
+                                <li><strong>/api/v1/:</strong> Ruteo a Microservicios</li>
+                                <li><strong>/ws/:</strong> Proxy WebSockets Telemedicina</li>
+                                <li>Compresión Gzip y HTTP/2</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Seguridad Perimetral <span class="tech-badge bg-secondary text-white">Security</span></h6>
+                            <ul>
+                                <li>Cabeceras HSTS, CSP y X-Frame</li>
+                                <li>Protección contra CSRF y XSS</li>
+                                <li>Rate Limiting contra fuerza bruta</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 3: Core Backend (Django) -->
+            <div class="col-12 col-xl">
+                <div class="tier-column tier-3">
+                    <div class="tier-header">
+                        <i class="fa-brands fa-python"></i> 3. Core Django
+                    </div>
+                    <div class="tier-body">
+                        <div class="card-component">
+                            <h6>Servidor WSGI <span class="tech-badge bg-indigo text-white" style="background:#6366f1;">Gunicorn 21</span></h6>
+                            <ul>
+                                <li>Administrador de procesos Python Workers</li>
+                                <li>Conexión mediante socket UNIX / TCP local</li>
+                                <li>Manejo de concurrencia y timeouts</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Núcleo Django 6.0 <span class="tech-badge bg-success text-white">Monolito</span></h6>
+                            <ul>
+                                <li><strong>Middlewares:</strong> Auth, Session, CSRF</li>
+                                <li><strong>apps.agenda:</strong> Citas y turnos</li>
+                                <li><strong>apps.clientes:</strong> Pacientes y dueños</li>
+                                <li><strong>apps.medico:</strong> Historias y vacunas</li>
+                                <li><strong>apps.inventario:</strong> Fármacos y stock</li>
+                                <li><strong>apps.facturacion:</strong> Comprobantes y caja</li>
+                                <li><strong>apps.grooming:</strong> Peluquería</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Django ORM <span class="tech-badge bg-primary text-white">Data Layer</span></h6>
+                            <ul>
+                                <li>Mapeo Objeto-Relacional Modelos</li>
+                                <li>Transacciones atómicas (ACID)</li>
+                                <li>Cliente Celery / Despacho a Redis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 4: Microservicios Satélite -->
+            <div class="col-12 col-xl">
+                <div class="tier-column tier-4">
+                    <div class="tier-header">
+                        <i class="fa-solid fa-cubes"></i> 4. Microservicios
+                    </div>
+                    <div class="tier-body">
+                        <div class="card-component">
+                            <h6>MS 1: Notificaciones <span class="tech-badge bg-purple text-white" style="background:#c026d3;">FastAPI</span></h6>
+                            <ul>
+                                <li>Recordatorios de citas vía WhatsApp API</li>
+                                <li>Alertas de vacunas por vencer (Email/SMS)</li>
+                                <li>Consumo asíncrono desde cola Redis</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>MS 2: Facturación & Pagos <span class="tech-badge bg-purple text-white" style="background:#a21caf;">Node / API</span></h6>
+                            <ul>
+                                <li>Firma digital XML de comprobante fiscal</li>
+                                <li>Pasarela de cobros en línea (Stripe/Culqi)</li>
+                                <li>Webhooks de conciliación bancaria</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>MS 3: Telemedicina <span class="tech-badge bg-purple text-white" style="background:#86198f;">WebRTC</span></h6>
+                            <ul>
+                                <li>Consultas virtuales por videollamada</li>
+                                <li>Chat en tiempo real veterinario-dueño</li>
+                                <li>Node.js + WebSockets + Janus Gateway</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>MS 4: Reportes & BI <span class="tech-badge bg-dark text-white">Celery Worker</span></h6>
+                            <ul>
+                                <li>Generación pesada de balances PDF (ReportLab)</li>
+                                <li>Exportación masiva de Kárdex a Excel</li>
+                                <li>Procesamiento en background sin congelar web</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 5: Persistencia y Datos -->
+            <div class="col-12 col-xl">
+                <div class="tier-column tier-5">
+                    <div class="tier-header">
+                        <i class="fa-solid fa-database"></i> 5. Persistencia
+                    </div>
+                    <div class="tier-body">
+                        <div class="card-component">
+                            <h6>Base de Datos MySQL <span class="tech-badge bg-warning text-dark">RDBMS</span></h6>
+                            <ul>
+                                <li><strong>Esquema:</strong> <code>sistema_veterinaria_db</code></li>
+                                <li>Tablas: Pacientes, Citas, Consultas, Kárdex, Facturas, Usuarios</li>
+                                <li>Integridad referencial y transacciones ACID</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Redis 7.x (En Memoria) <span class="tech-badge bg-danger text-white">In-Memory</span></h6>
+                            <ul>
+                                <li>Caché de sesiones de usuarios activos</li>
+                                <li>Caché de KPIs del Dashboard</li>
+                                <li>Message Broker para Celery y Microservicios</li>
+                            </ul>
+                        </div>
+                        <div class="card-component">
+                            <h6>Almacenamiento de Archivos <span class="tech-badge bg-secondary text-white">Storage</span></h6>
+                            <ul>
+                                <li><code>/media/</code> Fotos de mascotas y logos</li>
+                                <li><code>/backups/</code> Respaldos SQL (.sql)</li>
+                                <li>Consentimientos y recetas firmadas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sección Inferior: Flujo de Comunicación (12 Pasos) -->
+        <div class="lifecycle-container">
+            <h5 class="fw-bold mb-4 text-dark d-flex align-items-center gap-2">
+                <i class="fa-solid fa-route text-primary"></i> 
+                Flujo de Comunicación E2E (Ciclo de Vida de la Petición: del Dominio a la Respuesta)
+            </h5>
+            
+            <div class="row g-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">1</div>
+                        <div class="step-content">
+                            <h6>Solicitud Inicial</h6>
+                            <p>El usuario ingresa <code>https://vetsystem.clinica.com</code> en su navegador web.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">2</div>
+                        <div class="step-content">
+                            <h6>Resolución DNS</h6>
+                            <p>El DNS (Cloudflare) traduce el nombre de dominio a la IP pública del servidor.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">3</div>
+                        <div class="step-content">
+                            <h6>Handshake HTTPS</h6>
+                            <p>Conexión segura TLS 1.3 al puerto 443 de Nginx. Se verifica el certificado SSL.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">4</div>
+                        <div class="step-content">
+                            <h6>Inspección Nginx</h6>
+                            <p>Nginx sirve estáticos directos (CSS/JS) o hace <code>proxy_pass</code> a Gunicorn.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">5</div>
+                        <div class="step-content">
+                            <h6>Traspaso WSGI</h6>
+                            <p>Gunicorn toma la petición HTTP y la entrega al core de Django como entorno WSGI.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">6</div>
+                        <div class="step-content">
+                            <h6>Middlewares</h6>
+                            <p>Django valida seguridad: sesión de usuario activa, permisos RBAC y token CSRF.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">7</div>
+                        <div class="step-content">
+                            <h6>Enrutador URLs</h6>
+                            <p><code>urls.py</code> ejecuta la vista del módulo correspondiente (ej. <code>apps.medico</code>).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">8</div>
+                        <div class="step-content">
+                            <h6>Consulta ORM</h6>
+                            <p>La vista consulta o guarda datos mediante Django ORM contra MySQL (y caché Redis).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">9</div>
+                        <div class="step-content">
+                            <h6>Microservicios</h6>
+                            <p>Si es tarea pesada (WhatsApp, SAT o PDF), se despacha en segundo plano a Redis.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">10</div>
+                        <div class="step-content">
+                            <h6>Renderizado MVT</h6>
+                            <p>Django ensambla el HTML final con datos usando su motor de plantillas o responde JSON API.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">11</div>
+                        <div class="step-content">
+                            <h6>Retorno de Respuesta</h6>
+                            <p>HTTP 200 viaja de regreso: Django &rarr; Gunicorn &rarr; Nginx &rarr; Navegador.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-box">
+                        <div class="step-circle">12</div>
+                        <div class="step-content">
+                            <h6>Pintado en Cliente</h6>
+                            <p>El navegador renderiza el DOM, aplica Bootstrap 5 y dibuja gráficos con Chart.js.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

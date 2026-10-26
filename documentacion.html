@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Manual Técnico y de Arquitectura - VetSystem</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            background: #ffffff;
+        }
+        h1, h2, h3, h4 {
+            color: #0f172a;
+            font-weight: 700;
+        }
+        h1 {
+            border-bottom: 4px solid #0bb8c8;
+            color: #0bb8c8;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        h2 {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: #0284c7;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.88rem;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+        blockquote {
+            border-left: 4px solid #0bb8c8;
+            padding-left: 1rem;
+            color: #475569;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Manual Técnico y de Usuario - Sistema Veterinario "VetSystem"</h1>
+<h2>1. Tecnologías de Desarrollo</h2>
+<p>El sistema ha sido desarrollado utilizando un stack tecnológico moderno, robusto y escalable, ideal para aplicaciones web empresariales:</p>
+<ul>
+<li><strong>Lenguaje de Programación (Backend):</strong> Python 3</li>
+<li><strong>Framework Web:</strong> Django (MVT - Model View Template)</li>
+<li><strong>Base de Datos:</strong> MySQL / MariaDB</li>
+<li><strong>Frontend (Interfaz de Usuario):</strong><ul>
+<li>HTML5 / CSS3</li>
+<li>Bootstrap 5 (Framework CSS)</li>
+<li>JavaScript Vanilla (Para interactividad y librerías)</li>
+<li>Chart.js (Para gráficos estadísticos interactivos)</li>
+<li>FontAwesome (Iconografía)</li>
+</ul>
+</li>
+<li><strong>Arquitectura:</strong> Monolítica con renderizado del lado del servidor (SSR).</li>
+</ul>
+<hr />
+<h2>2. Funcionalidades del Sistema</h2>
+<p>El sistema VetSystem está compuesto por módulos integrados que cubren todas las necesidades operativas de una clínica veterinaria:</p>
+<h3>2.1. Panel de Control (Dashboard)</h3>
+<ul>
+<li>Visualización en tiempo real de métricas clave (KPIs): Total de mascotas, clientes, citas de hoy e ingresos del día.</li>
+<li>Gráficos estadísticos dinámicos (Pacientes por especie, Citas por estado, Rendimiento mensual).</li>
+<li>Tablas resumen interactivas de los próximos eventos.</li>
+</ul>
+<h3>2.2. Gestión de Clientes y Mascotas</h3>
+<ul>
+<li>Registro completo de propietarios (Datos personales, contacto, ubicación).</li>
+<li>Registro detallado de mascotas asociadas a cada cliente (Nombre, especie, raza, peso, fecha de nacimiento, foto).</li>
+</ul>
+<h3>2.3. Agenda Médica</h3>
+<ul>
+<li>Calendario interactivo para programar, reprogramar y cancelar turnos.</li>
+<li>Manejo de distintos tipos de citas (Consulta general, vacunación, peluquería, cirugía).</li>
+<li>Control de estados (Pendiente, Confirmada, Cancelada, Atendida).</li>
+</ul>
+<h3>2.4. Área Clínica (Médico)</h3>
+<ul>
+<li><strong>Historia Clínica:</strong> Registro evolutivo de cada paciente. Incluye motivo de consulta, examen físico detallado (peso, temperatura, frecuencia cardíaca/respiratoria), diagnóstico y tratamiento.</li>
+<li><strong>Vacunaciones:</strong> Control del esquema de vacunación, lote de vacunas y fechas de próximas dosis recomendadas.</li>
+<li><strong>Telemedicina:</strong> Plataforma integrada para registrar consultas virtuales a distancia y adjuntar enlaces de videollamada.</li>
+</ul>
+<h3>2.5. Peluquería (Grooming)</h3>
+<ul>
+<li>Gestión de órdenes de servicio estético para mascotas.</li>
+<li>Control de fecha y hora de inicio/fin del servicio, observaciones y estado del progreso (En curso, Terminado).</li>
+</ul>
+<h3>2.6. Gestión Comercial e Inventario</h3>
+<ul>
+<li><strong>Inventario:</strong> Catálogo completo de productos, medicamentos y accesorios.</li>
+<li>Control riguroso de stock (Stock actual vs. Stock mínimo).</li>
+<li>Kárdex de movimientos: Registro automático de entradas (compras) y salidas (ventas/uso interno).</li>
+<li><strong>Facturación:</strong> Emisión de comprobantes de pago detallados, selección de métodos de pago (Efectivo, Tarjeta, Transferencia) y cálculo automático de IGV/IVA.</li>
+<li><strong>Control de Caja:</strong> Apertura y cierre diario de caja registradora de la clínica, calculando el dinero inicial, los ingresos del día y el arqueo final.</li>
+</ul>
+<h3>2.7. Reportes y Business Intelligence (BI)</h3>
+<ul>
+<li>Generación de reportes tabulares y gráficos financieros.</li>
+<li>Filtros dinámicos por rango de fechas para analizar el rendimiento económico mensual o diario de la veterinaria.</li>
+</ul>
+<h3>2.8. Sistema y Seguridad</h3>
+<ul>
+<li><strong>Configuración Global:</strong> Personalización de los datos de la clínica (Nombre, Logo corporativo, Moneda local, Contacto, Colores de la interfaz).</li>
+<li><strong>Usuarios:</strong> Creación de perfiles de acceso (Administradores, Cajeros, Veterinarios).</li>
+<li><strong>Mantenimiento:</strong> Herramienta interna para realizar Backups (Copias de seguridad) directos de la base de datos SQL, Restauración de backups y Reseteo del sistema (limpieza de datos transaccionales para iniciar en limpio).</li>
+</ul>
+<hr />
+<h2>3. Instalación y Configuración Local</h2>
+<p>Para ejecutar el sistema en una computadora nueva (con Windows), siga estos pasos:</p>
+<h3>Prerrequisitos</h3>
+<ol>
+<li>Instalar <strong>Python 3.10 o superior</strong> (asegurarse de marcar la casilla "Add Python to PATH" durante la instalación).</li>
+<li>Instalar un servidor local de bases de datos como <strong>XAMPP</strong>, <strong>WAMP</strong> o instalar <strong>MySQL Server</strong> de forma independiente.</li>
+</ol>
+<h3>Paso a paso</h3>
+<ol>
+<li><strong>Preparar la Base de Datos:</strong><ul>
+<li>Inicie su servidor MySQL (ej. abrir panel de XAMPP e iniciar "MySQL").</li>
+<li>Abra phpMyAdmin o la consola MySQL y cree una base de datos vacía llamada: <code>sistema_veterinaria_db</code>.</li>
+</ul>
+</li>
+<li><strong>Configurar el Proyecto:</strong><ul>
+<li>Copie la carpeta del código fuente (<code>sistema-veterinaria</code>) en su computadora (ej. en <code>C:\Webs\Python\sistema-veterinaria</code>).</li>
+<li>Abra la terminal (Símbolo del sistema o PowerShell) y navegue hasta la carpeta del proyecto:
+    <code>cd C:\Webs\Python\sistema-veterinaria</code></li>
+</ul>
+</li>
+<li><strong>Entorno Virtual y Dependencias (Recomendado):</strong><ul>
+<li>Cree un entorno virtual (solo la primera vez): <code>python -m venv venv</code></li>
+<li>Active el entorno virtual: <code>venv\Scripts\activate</code></li>
+<li>Instale las librerías necesarias: <code>pip install -r requirements.txt</code> (o instale <code>django</code>, <code>mysqlclient</code>, etc., si no hay requirements).</li>
+</ul>
+</li>
+<li><strong>Migrar la Base de Datos:</strong><ul>
+<li>Construya las tablas en MySQL ejecutando:
+    <code>python manage.py makemigrations</code>
+    <code>python manage.py migrate</code></li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>4. Cómo Ejecutar la Aplicación (Modo Desarrollo)</h2>
+<p>Cada vez que desee encender el sistema para trabajar localmente, siga estos dos sencillos pasos desde el Símbolo del Sistema (CMD) o PowerShell:</p>
+<ol>
+<li>Navegue a la carpeta y active el entorno virtual:
+    <code>cd C:\Webs\Python\sistema-veterinaria</code>
+    <code>venv\Scripts\activate</code></li>
+<li>Encienda el servidor local de Django:
+    <code>python manage.py runserver</code></li>
+<li>Abra su navegador web preferido y visite la siguiente dirección:
+    <strong>http://127.0.0.1:8080/</strong></li>
+</ol>
+<hr />
+<h2>5. Credenciales de Acceso (Usuario Administrador)</h2>
+<p>Si es la primera vez que instala el sistema, debe crear un Superusuario maestro.
+Con el entorno virtual activado, ejecute:</p>
+<p><code>python manage.py createsuperuser</code></p>
+<p>Siga las instrucciones en la pantalla de la consola:
+*   <strong>Username (Usuario):</strong> admin
+*   <strong>Email:</strong> (puede dejarlo en blanco presionando Enter)
+*   <strong>Password (Contraseña):</strong> admin123 <em>(Nota: al escribir la contraseña en la consola, no se verán los caracteres por seguridad, pero sí se están registrando).</em>
+*   <strong>Password (Confirmación):</strong> admin123</p>
+<p>Utilice estas credenciales en la pantalla de inicio de sesión de la aplicación web.</p>
+<hr />
+<h2>6. Recomendación de Hosting y Despliegue a Producción</h2>
+<p>Para llevar esta aplicación a internet para que funcione 24/7, la recomendación ideal, buscando la mejor relación calidad/precio para aplicaciones en Django, es utilizar un plan <strong>VPS (Servidor Privado Virtual)</strong> o un servicio PaaS.</p>
+<p><strong>Las mejores opciones:</strong>
+1.  <strong>DigitalOcean (Droplet) / Linode / Vultr</strong> (Recomendado - Mayor control y economía, ~$5 - $10 USD/mes).
+2.  <strong>PythonAnywhere</strong> (Excelente para principiantes en Python, muy fácil despliegue, plan básico ~$5 USD/mes).
+3.  <strong>Railway.app / Render</strong> (Modernos, sincronización directa con GitHub, cobran por uso).</p>
+<h3>Guía Paso a Paso para Despliegue (Ejemplo General para VPS con Ubuntu Server)</h3>
+<p>Para un VPS (como DigitalOcean), la arquitectura estándar de producción es: <strong>Gunicorn (Servidor de aplicaciones) + Nginx (Proxy Inverso) + MySQL/PostgreSQL</strong>.</p>
+<p><strong>Paso 1: Preparar el Servidor</strong>
+1. Acceda a su VPS mediante SSH: <code>ssh root@ip_del_servidor</code>
+2. Actualice los paquetes del servidor: <code>apt update &amp;&amp; apt upgrade -y</code>
+3. Instale dependencias de sistema: <code>apt install python3-pip python3-venv nginx mysql-server libmysqlclient-dev -y</code></p>
+<p><strong>Paso 2: Configurar la Base de Datos en el Servidor</strong>
+1. Entre a MySQL: <code>mysql -u root</code>
+2. Cree la base de datos y un usuario seguro:
+   <code>CREATE DATABASE sistema_veterinaria_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</code>
+   <code>CREATE USER 'vet_user'@'localhost' IDENTIFIED BY 'TuContraSegura123!';</code>
+   <code>GRANT ALL PRIVILEGES ON sistema_veterinaria_db.* TO 'vet_user'@'localhost';</code>
+   <code>FLUSH PRIVILEGES; EXIT;</code></p>
+<p><strong>Paso 3: Subir el Código y Preparar Entorno</strong>
+1. Transfiera los archivos de su proyecto al servidor (usando FTP/FileZilla, SCP, o clonando desde GitHub). Colóquelo en <code>/var/www/sistema-veterinaria/</code>
+2. Navegue al directorio: <code>cd /var/www/sistema-veterinaria</code>
+3. Cree y active un entorno virtual: <code>python3 -m venv venv</code> y <code>source venv/bin/activate</code>
+4. Instale las librerías de Python e incluya el servidor de producción: <code>pip install -r requirements.txt gunicorn</code>
+5. Edite su archivo <code>settings.py</code> para producción:
+   * Cambie <code>DEBUG = False</code>
+   * Añada la IP o Dominio del servidor: <code>ALLOWED_HOSTS = ['midominio.com', 'IP_DEL_SERVIDOR']</code>
+   * Actualice las credenciales en <code>DATABASES</code> para que coincidan con el Paso 2.
+6. Ejecute migraciones y recolecte archivos estáticos:
+   <code>python manage.py migrate</code>
+   <code>python manage.py collectstatic</code></p>
+<p><strong>Paso 4: Configurar Gunicorn como Servicio del Sistema (Para que nunca se apague)</strong>
+1. Cree un archivo de servicio: <code>nano /etc/systemd/system/gunicorn.service</code>
+2. Pegue esta configuración básica:
+   ```ini
+   [Unit]
+   Description=gunicorn daemon
+   After=network.target</p>
+<p>[Service]
+   User=root
+   Group=www-data
+   WorkingDirectory=/var/www/sistema-veterinaria
+   Environment="PATH=/var/www/sistema-veterinaria/venv/bin"
+   ExecStart=/var/www/sistema-veterinaria/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/var/www/sistema-veterinaria/sistema_veterinaria.sock veterinaria.wsgi:application</p>
+<p>[Install]
+   WantedBy=multi-user.target
+   <code>``
+3. Inicie el servicio:</code>systemctl start gunicorn<code>y</code>systemctl enable gunicorn`</p>
+<p><strong>Paso 5: Configurar Nginx (Para recibir a los usuarios por el puerto 80)</strong>
+1. Cree un archivo de configuración Nginx: <code>nano /etc/nginx/sites-available/sistema_veterinaria</code>
+2. Agregue el siguiente bloque (cambie su_dominio.com):
+   ```nginx
+   server {
+       listen 80;
+       server_name su_dominio.com IP_DEL_SERVIDOR;</p>
+<pre><code>   location = /favicon.ico { access_log off; log_not_found off; }
+
+   location /static/ {
+       root /var/www/sistema-veterinaria;
+   }
+
+   location /media/ {
+       root /var/www/sistema-veterinaria;
+   }
+
+   location / {
+       include proxy_params;
+       proxy_pass http://unix:/var/www/sistema-veterinaria/sistema_veterinaria.sock;
+   }
+</code></pre>
+<p>}
+   <code>``
+3. Active el sitio:</code>ln -s /etc/nginx/sites-available/sistema_veterinaria /etc/nginx/sites-enabled<code>4. Reinicie Nginx:</code>systemctl restart nginx`</p>
+<p><strong>Paso final:</strong> Si va a su navegador y digita la IP de su servidor o su dominio, el sistema VetSystem estará disponible públicamente, de manera robusta y segura.</p>
+<hr />
+<h2>6. Arquitectura Tecnológica: Monolito Modular con Microservicios Satélite</h2>
+<p>Para maximizar la escalabilidad, alta disponibilidad y tolerancia a fallos sin perder la agilidad de desarrollo, el sistema <strong>VetSystem</strong> implementa una arquitectura híbrida compuesta por:
+*   <strong>Núcleo Central (Core Monolith):</strong> Desarrollado en Python con Django, encargado del renderizado de interfaces (MVT), la lógica de negocio clínica, autenticación, control de accesos y la gestión transaccional principal.
+*   <strong>Microservicios Satélite Desacoplados:</strong> Microservicios independientes construidos con <strong>FastAPI</strong> y <strong>WebSockets</strong>, corriendo en puertos dedicados y comunicados vía HTTP/REST y sockets bidireccionales.</p>
+<h3>Detalle de los Microservicios Implementados</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Microservicio</th>
+<th style="text-align: center;">Puerto</th>
+<th style="text-align: left;">Stack Tecnológico</th>
+<th style="text-align: left;">Responsabilidad y Endpoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>MS 1: Notificaciones y Recordatorios</strong></td>
+<td style="text-align: center;"><code>8081</code></td>
+<td style="text-align: left;">FastAPI, Pydantic, Uvicorn</td>
+<td style="text-align: left;">Envío asíncrono de recordatorios de citas y alertas de vacunación por WhatsApp/SMS/Email.<br>• <code>POST /api/v1/notificaciones/cita</code><br>• <code>POST /api/v1/notificaciones/vacuna</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MS 2: Facturación Electrónica y Pagos</strong></td>
+<td style="text-align: center;"><code>8082</code></td>
+<td style="text-align: left;">FastAPI, Hashlib SHA-256, UBL 2.1</td>
+<td style="text-align: left;">Emisión de comprobantes fiscales electrónicos con firma digital, cálculo de código QR tributario y procesamiento de cobros con tarjeta.<br>• <code>POST /api/v1/facturacion/emitir-comprobante</code><br>• <code>POST /api/v1/pagos/procesar-tarjeta</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MS 3: Telemedicina y Streaming WebRTC</strong></td>
+<td style="text-align: center;"><code>8083</code></td>
+<td style="text-align: left;">FastAPI, WebSockets, WebRTC P2P</td>
+<td style="text-align: left;">Servidor de señalización y canales WebSocket para consultas virtuales veterinarias y chat en vivo.<br>• <code>POST /api/v1/telemedicina/crear-sala</code><br>• <code>WSS /ws/sala/{sala_id}</code><br>• Interfaz WebRTC: <code>/sala/{sala_id}</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MS 4: Generación Asíncrona de Reportes y BI</strong></td>
+<td style="text-align: center;"><code>8084</code></td>
+<td style="text-align: left;">FastAPI, ReportLab, BackgroundTasks</td>
+<td style="text-align: left;">Procesamiento en segundo plano de balances financieros, cálculo de KPIs y exportación a PDF sin saturar el hilo web de Django.<br>• <code>POST /api/v1/reportes/balance-pdf</code><br>• <code>GET /api/v1/reportes/descargar/{filename}</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Tolerancia a Fallos y Alta Disponibilidad</h3>
+<p>El cliente de integración (<code>apps/core/services_client.py</code>) implementa timeouts estrictos y manejo de excepciones resiliente. Si alguno de los microservicios se encuentra apagado o en mantenimiento, el sistema principal de Django <strong>continúa operando con total normalidad</strong>, registrando las citas o comprobantes en la base de datos local y notificando preventivamente al usuario.</p>
+<hr />
+<h2>7. Flujo de Comunicación de Punta a Punta (Ciclo de Vida de la Petición)</h2>
+<p>A continuación se detalla el ciclo completo que sigue una solicitud desde que el usuario digita el dominio en su navegador hasta que visualiza la respuesta en pantalla:</p>
+<pre><code>[Usuario / Navegador]
+       │  (1. Digita https://vetsystem.com)
+       ▼
+[Cloudflare DNS Anycast] ────► (2. Resuelve IP del Servidor)
+       │  (3. TLS 1.3 / HTTP/2 + WAF)
+       ▼
+[Nginx Reverse Proxy :80/:443] ───► (4. Sirve /static/ y /media/ directamente)
+       │  (5. Proxy Pass WSGI / Socket UNIX)
+       ▼
+[Gunicorn Application Server] ───► (6. Prefork Workers de Python)
+       │
+       ▼
+[Django Core (settings / urls.py)]
+       ├── (7. Pipeline de Middlewares: Security, CSRF, Session, Auth)
+       ├── (8. Router de URLs hacia la Vista del Módulo: agenda, medico, etc.)
+       │
+       ├──► [MySQL 8.0 / MariaDB] ──── (9. Consultas ACID vía Django ORM)
+       ├──► [Redis 7 Cache / Broker] ─ (10. Caché de sesión y cola de mensajes)
+       │
+       └──► [Microservicios Satélite :8081 - :8084]
+                  ├── MS 1 (8081): Despacho de WhatsApp al crear cita o vacuna
+                  ├── MS 2 (8082): Timbrado fiscal SHA-256 de factura
+                  ├── MS 3 (8083): Creación de sala WebRTC para teleconsulta
+                  └── MS 4 (8084): Tarea en segundo plano para PDF de balance
+       │
+       ▼
+[Motor MVT (Renderizado HTML Server-Side)]
+       │  (11. HTTP Response 200 viaja de regreso: Django ➔ Gunicorn ➔ Nginx ➔ Navegador)
+       ▼
+[Navegador del Usuario]
+       │  (12. Pintado final del DOM, CSS Bootstrap 5 y gráficos Chart.js)
+</code></pre>
+<h3>Paso a Paso Detallado:</h3>
+<ol>
+<li><strong>Petición Inicial:</strong> El usuario abre el navegador web e ingresa <code>https://vetsystem.com/agenda/</code>.</li>
+<li><strong>Resolución de Nombres DNS:</strong> Los servidores Anycast de Cloudflare traducen el nombre de dominio a la dirección IP pública de nuestro servidor.</li>
+<li><strong>Capa Edge y Seguridad:</strong> Cloudflare verifica las reglas del WAF (filtrado anti-DDoS), negocia el certificado SSL/TLS y transmite el tráfico cifrado al servidor VPS.</li>
+<li><strong>Proxy Inverso Nginx:</strong> Nginx recibe la conexión por el puerto 443. Si la petición corresponde a activos estáticos (<code>/static/</code> o <code>/media/</code>), Nginx los entrega directamente desde disco con compresión Gzip sin sobrecargar Python. Si es una petición dinámica, la redirige a Gunicorn.</li>
+<li><strong>Servidor de Aplicación Gunicorn:</strong> Gunicorn administra un pool de trabajadores (workers) en Python, recibiendo la solicitud a través de un socket UNIX o TCP local.</li>
+<li><strong>Pipeline de Middlewares en Django:</strong> La petición atraviesa capas automáticas de seguridad: validación HTTPS, verificación de tokens CSRF, lectura de cookies de sesión y autenticación del usuario actual.</li>
+<li><strong>Enrutamiento:</strong> <code>veterinaria/urls.py</code> analiza la ruta y delega el control a la función de vista correspondiente (ej: <code>agenda_lista</code> o <code>cita_crear</code>).</li>
+<li><strong>Capa de Datos (ORM y MySQL):</strong> La vista ejecuta consultas optimizadas mediante el ORM de Django hacia MySQL (<code>sistema_veterinaria_db</code>), recuperando pacientes, turnos e historiales clínicos.</li>
+<li><strong>Despacho a Microservicios:</strong> Si la acción del usuario dispara un evento desacoplado (como agendar una cita o emitir una boleta), el cliente <code>MicroservicesClient</code> realiza una llamada REST asíncrona hacia el microservicio correspondiente (puertos 8081, 8082, 8083 o 8084).</li>
+<li><strong>Renderizado del Template:</strong> Django combina los datos del modelo con las plantillas HTML (<code>templates/agenda/lista.html</code>), ensamblando el documento final.</li>
+<li><strong>Retorno de la Respuesta HTTP:</strong> La respuesta viaja de vuelta: Django $\rightarrow$ Gunicorn $\rightarrow$ Nginx $\rightarrow$ Cloudflare $\rightarrow$ Navegador del cliente.</li>
+<li><strong>Pintado en el Cliente:</strong> El navegador interpreta el HTML, aplica las hojas de estilo de Bootstrap 5 y ejecuta los scripts de Chart.js para dibujar los gráficos interactivos del panel.</li>
+</ol>
+<hr />
+<h2>8. Entregables de la Tarea Académica</h2>
+<p>En la carpeta raíz del proyecto y en el módulo web <code>/microservicios/</code> se encuentran disponibles los archivos oficiales listos para su entrega y presentación:</p>
+<ol>
+<li><strong><code>arquitectura_vetsystem.png</code>:</strong> Diagrama arquitectónico en Ultra Alta Definición (300 DPI, 2700 x 1720 px), con diseño corporativo, 5 capas tecnológicas identificadas y el flujo enumerado de 12 pasos.</li>
+<li><strong><code>arquitectura_vetsystem.pdf</code>:</strong> Documento vectorial en formato apaisado (Landscape A3) generado con ReportLab, ideal para impresión o adjuntar en plataformas académicas (Moodle, Canvas, Teams).</li>
+<li><strong><code>arquitectura_vetsystem.drawio</code>:</strong> Archivo nativo en formato XML para abrir, editar y personalizar directamente en <a href="https://app.diagrams.net">Draw.io / diagrams.net</a>.</li>
+<li><strong><code>arquitectura_vetsystem.html</code>:</strong> Dashboard web interactivo con visualizador del diagrama y botones directos de descarga.</li>
+<li><strong><code>iniciar_sistema_completo.bat</code>:</strong> Script de encendido automático con un clic para levantar simultáneamente los 4 microservicios y el servidor web Django.</li>
+</ol>
+</body>
+</html>

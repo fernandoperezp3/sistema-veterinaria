@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-10-15T00:00:00.000Z" agent="VetSystem Architecture Generator" version="21.0.0" type="device">
+  <diagram id="vetsystem-arch-full" name="Arquitectura VetSystem">
+    <mxGraphModel dx="1920" dy="1080" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" background="#F8FAFC">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;b&gt;ARQUITECTURA TECNOLÓGICA WEB - SISTEMA VETERINARIO &amp;quot;VetSystem&amp;quot;&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size: 13px; font-weight: normal; color: #94A3B8;'&gt;Monolito Modular Django 6 + Microservicios Satélite + Nginx + MySQL + Redis (12 Pasos E2E)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=#0F172A;align=left;verticalAlign=middle;spacingLeft=30;rounded=1;fontColor=#FFFFFF;fontSize=18;fontFamily=Segoe UI;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1840" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" value="&lt;b&gt;1. CAPA CLIENTE / FRONTEND&lt;/b&gt;" style="swimlane;startSize=40;rounded=1;arcSize=8;fillColor=#EFF6FF;strokeColor=#3B82F6;strokeWidth=2;fontFamily=Segoe UI;fontSize=13;fontColor=#0F172A;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="105" width="330" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="&lt;b&gt;2. CAPA RED &amp;amp; PROXY (EDGE)&lt;/b&gt;" style="swimlane;startSize=40;rounded=1;arcSize=8;fillColor=#ECFDF5;strokeColor=#10B981;strokeWidth=2;fontFamily=Segoe UI;fontSize=13;fontColor=#0F172A;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="105" width="330" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="&lt;b&gt;3. CORE BACKEND (DJANGO)&lt;/b&gt;" style="swimlane;startSize=40;rounded=1;arcSize=8;fillColor=#EEF2FF;strokeColor=#6366F1;strokeWidth=2;fontFamily=Segoe UI;fontSize=13;fontColor=#0F172A;align=center;" vertex="1" parent="1">
+          <mxGeometry x="760" y="105" width="420" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="&lt;b&gt;4. MICROSERVICIOS PROPUESTOS&lt;/b&gt;" style="swimlane;startSize=40;rounded=1;arcSize=8;fillColor=#FDF4FF;strokeColor=#D946EF;strokeWidth=2;fontFamily=Segoe UI;fontSize=13;fontColor=#0F172A;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="105" width="330" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="&lt;b&gt;5. PERSISTENCIA Y DATOS&lt;/b&gt;" style="swimlane;startSize=40;rounded=1;arcSize=8;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=2;fontFamily=Segoe UI;fontSize=13;fontColor=#0F172A;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1570" y="105" width="310" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="n_browser" value="&lt;b&gt;Navegador Web (Cliente)&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Chrome / Edge / Mobile&lt;br/&gt;• Petición HTTPS: vetsystem.com&lt;br/&gt;• Roles: Veterinario, Recepción, Admin&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="n_ui_tech" value="&lt;b&gt;Tecnologías Frontend&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• HTML5 Semántico + CSS3&lt;br/&gt;• Bootstrap 5 (Responsive UI)&lt;br/&gt;• JavaScript Vanilla (Fetch API)&lt;br/&gt;• Chart.js (KPIs Clínicos)&lt;br/&gt;• FontAwesome 6&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="60" y="280" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="n_ui_mod" value="&lt;b&gt;Módulos de Usuario&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Agenda de Citas y Turnos&lt;br/&gt;• Historias Clínicas y Vacunas&lt;br/&gt;• Inventario y Medicamentos&lt;br/&gt;• Facturación y Cierre de Caja&lt;br/&gt;• Telemedicina en Vivo&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D4ED8;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="60" y="420" width="290" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="n_dns" value="&lt;b&gt;DNS &amp;amp; CDN (Cloudflare)&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Resolución de dominio a IP Pública&lt;br/&gt;• Terminación SSL/TLS (HTTPS)&lt;br/&gt;• Mitigación DDoS / WAF&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#10B981;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="420" y="160" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="n_nginx" value="&lt;b&gt;Servidor Web Nginx 1.24&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Proxy Inverso &amp;amp; Gateway&lt;br/&gt;• Sirve /static/ y /media/ directos&lt;br/&gt;• proxy_pass a Gunicorn (WSGI)&lt;br/&gt;• Redirección a Microservicios&lt;br/&gt;• WebSockets Proxy (/ws/)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#059669;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="420" y="280" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="n_waf" value="&lt;b&gt;Seguridad Perimetral&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Protección CSRF, XSS, HSTS&lt;br/&gt;• Rate Limiting de peticiones&lt;br/&gt;• Compresión Gzip / Brotli&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#047857;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="420" y="440" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="n_gunicorn" value="&lt;b&gt;Servidor WSGI (Gunicorn 21.x)&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Manejador de Procesos Python (Workers)&lt;br/&gt;• Protocolo WSGI a Django&lt;br/&gt;• Socket UNIX / 127.0.0.1:8000&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6366F1;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="780" y="160" width="380" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="n_django" value="&lt;b&gt;Framework Django 6.0 (Core)&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Middlewares (Auth, Session, CSRF)&lt;br/&gt;• urls.py Router Principal&lt;br/&gt;• Apps: agenda, clientes, medico,&lt;br/&gt;  inventario, facturacion, grooming, usuarios&lt;br/&gt;• Django Template Engine (SSR) + API JSON&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4F46E5;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="780" y="270" width="380" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n_orm" value="&lt;b&gt;Django ORM &amp;amp; Celery Client&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Mapeo Objeto-Relacional Modelos&lt;br/&gt;• Transacciones atómicas seguras&lt;br/&gt;• Despacho de tareas asíncronas a Redis&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4338CA;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="780" y="440" width="380" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="n_ms1" value="&lt;b&gt;MS 1: Notificaciones&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• FastAPI + Twilio/WhatsApp&lt;br/&gt;• Recordatorios citas y vacunas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D946EF;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="160" width="290" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="n_ms2" value="&lt;b&gt;MS 2: Facturación &amp;amp; Pagos&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Node.js/FastAPI + Stripe&lt;br/&gt;• Firma Comprobante Fiscal SAT/SUNAT&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C026D3;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="260" width="290" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="n_ms3" value="&lt;b&gt;MS 3: Telemedicina &amp;amp; Video&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Node.js + Socket.IO + WebRTC&lt;br/&gt;• Salas de consulta y chat en vivo&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A21CAF;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="360" width="290" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="n_ms4" value="&lt;b&gt;MS 4: Reportes &amp;amp; BI Asíncrono&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Celery Worker + ReportLab&lt;br/&gt;• Generación pesada PDFs y Excel&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#86198F;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="460" width="290" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="n_mysql" value="&lt;b&gt;Base de Datos MySQL 8.0&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• BD: sistema_veterinaria_db&lt;br/&gt;• Tablas: Mascotas, Clientes, Citas,&lt;br/&gt;  Historias Clínicas, Kárdex, Facturas&lt;br/&gt;• Integridad Referencial ACID&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="1590" y="160" width="270" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="n_redis" value="&lt;b&gt;Redis 7.x (En Memoria)&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• Caché de sesiones de usuario&lt;br/&gt;• Message Broker para Celery y MS&lt;br/&gt;• Colas Pub/Sub en tiempo real&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="1590" y="300" width="270" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="n_storage" value="&lt;b&gt;Almacenamiento Archivos&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:11px;color:#475569;'&gt;• /media/: Fotos mascotas, logos&lt;br/&gt;• /backups/: Copias SQL automáticas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B45309;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="1590" y="430" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="&lt;b&gt;(1) Solicitud HTTPS&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#3B82F6;strokeWidth=2;fontColor=#1D4ED8;fontSize=11;" edge="1" parent="1" source="n_browser" target="n_dns">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="&lt;b&gt;(2) Resuelve IP&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#10B981;strokeWidth=2;fontColor=#047857;fontSize=11;" edge="1" parent="1" source="n_dns" target="n_nginx">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="&lt;b&gt;(4) proxy_pass&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6366F1;strokeWidth=2;fontColor=#4338CA;fontSize=11;" edge="1" parent="1" source="n_nginx" target="n_gunicorn">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="&lt;b&gt;(5) WSGI Env&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6366F1;strokeWidth=2;fontColor=#4338CA;fontSize=11;" edge="1" parent="1" source="n_gunicorn" target="n_django">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="&lt;b&gt;(8) SQL Queries&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F59E0B;strokeWidth=2;fontColor=#B45309;fontSize=11;" edge="1" parent="1" source="n_django" target="n_mysql">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="&lt;b&gt;(9) Broker / Caché&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D97706;strokeWidth=2;fontColor=#B45309;fontSize=11;" edge="1" parent="1" source="n_django" target="n_redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="&lt;b&gt;Cola Tareas&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D946EF;strokeWidth=2;fontColor=#86198F;fontSize=11;" edge="1" parent="1" source="n_redis" target="n_ms1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="&lt;b&gt;(11) Respuesta HTTP&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#10B981;strokeWidth=2;dashed=1;fontColor=#047857;fontSize=11;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" edge="1" parent="1" source="n_nginx" target="n_browser">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="box_lifecycle" value="&lt;b&gt;CICLO DE VIDA DE LA PETICIÓN Y FLUJO DE COMUNICACIÓN PASO A PASO (E2E)&lt;/b&gt;&lt;br/&gt;&lt;font style='font-size:12px;color:#334155;'&gt;&lt;b&gt;[1] Navegador:&lt;/b&gt; Usuario teclea https://vetsystem.clinica.com. &lt;b&gt;[2] DNS Cloudflare:&lt;/b&gt; Resuelve la IP pública y valida SSL. &lt;b&gt;[3] Conexión HTTPS:&lt;/b&gt; Negociación TLS 1.3 con Nginx (Puerto 443). &lt;b&gt;[4] Nginx Proxy:&lt;/b&gt; Filtra estáticos directos o reenvía dinámica a Gunicorn. &lt;b&gt;[5] Gunicorn WSGI:&lt;/b&gt; Transforma petición HTTP y la pasa a Django. &lt;b&gt;[6] Middlewares:&lt;/b&gt; Django valida autenticación, sesión y token CSRF. &lt;b&gt;[7] urls.py:&lt;/b&gt; Enruta al controlador correspondiente (agenda, medico, facturacion). &lt;b&gt;[8] Django ORM:&lt;/b&gt; Consulta/persiste datos en MySQL y consulta caché en Redis. &lt;b&gt;[9] Microservicios:&lt;/b&gt; Despacha tareas pesadas asíncronas vía Redis (WhatsApp, SAT, PDFs). &lt;b&gt;[10] Render MVT:&lt;/b&gt; Django genera la plantilla HTML con Bootstrap o responde JSON API. &lt;b&gt;[11] Retorno:&lt;/b&gt; Respuesta HTTP 200 viaja en reversa (Django -&amp;gt; Gunicorn -&amp;gt; Nginx -&amp;gt; Cliente). &lt;b&gt;[12] Navegador:&lt;/b&gt; El navegador renderiza el DOM, aplica estilos Bootstrap y dibuja gráficos Chart.js.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#64748B;strokeWidth=2;fontFamily=Segoe UI;align=left;spacingLeft=20;spacingRight=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="805" width="1840" height="160" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
