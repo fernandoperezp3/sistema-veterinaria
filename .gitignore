@@ -1,0 +1,21 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+db.sqlite3
+staticfiles/
+backups/*.sql
+microservicios/reportes_bi/generados/
+media/mascotas/
+
+# Respaldos con datos reales (usar poblar_datos.py para datos de demo)
+bk_basededatos.sql
+*.sql
+
+# Variables de entorno y logs
+.env
+*.log
+veterinaria/local_settings.py
+_respaldo_antes_de_revision/
+_to_delete/
+.vscode/
