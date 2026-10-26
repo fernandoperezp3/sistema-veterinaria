@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}Monitor de Microservicios{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="fa-solid fa-cubes text-primary me-2"></i> Monitor de Microservicios Satélite
+            </h3>
+            <p class="text-muted mb-0">
+                Supervisión en tiempo real de la arquitectura distribuida desacoplada del sistema.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'microservicios_panel' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-arrows-rotate me-1"></i> Actualizar Estados
+            </a>
+            <a href="/static/arquitectura_vetsystem.html" target="_blank" class="btn btn-info btn-sm text-white">
+                <i class="fa-solid fa-project-diagram me-1"></i> Ver Diagrama Arquitectura
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de Estado General -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 bg-light rounded-circle text-primary">
+                    <i class="fa-solid fa-network-wired fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold">Estado del Clúster de Microservicios</h6>
+                    <div class="small text-muted">
+                        Monitoreo activo sobre <code>127.0.0.1</code> en puertos <code>8081</code>, <code>8082</code>, <code>8083</code> y <code>8084</code>.
+                    </div>
+                </div>
+            </div>
+            <div>
+                {% if total_online == total_servicios %}
+                <span class="badge bg-success px-3 py-2 fs-6">
+                    <i class="fa-solid fa-circle-check me-1"></i> {{ total_online }} / {{ total_servicios }} ONLINE (100% Operativo)
+                </span>
+                {% elif total_online > 0 %}
+                <span class="badge bg-warning text-dark px-3 py-2 fs-6">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ total_online }} / {{ total_servicios }} ONLINE (Parcial)
+                </span>
+                {% else %}
+                <span class="badge bg-danger px-3 py-2 fs-6">
+                    <i class="fa-solid fa-circle-xmark me-1"></i> 0 / {{ total_servicios }} ONLINE (Microservicios Apagados)
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if total_online == 0 %}
+    <!-- Alerta Informativa si están apagados -->
+    <div class="alert alert-warning border-0 shadow-sm mb-4">
+        <div class="d-flex gap-2 align-items-start">
+            <i class="fa-solid fa-info-circle fa-lg mt-1 text-warning"></i>
+            <div>
+                <strong>¿Cómo encender los microservicios?</strong><br>
+                Los microservicios son procesos desacoplados e independientes. Para activarlos todos juntos con un solo clic, ejecuta:
+                <code class="d-block bg-dark text-white p-2 rounded mt-2">python microservicios/orchestrator.py</code>
+                o haz doble clic sobre el archivo ejecutable <kbd>iniciar_microservicios.bat</kbd> en la raíz del proyecto.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tarjetas de los 4 Microservicios -->
+    <div class="row g-4">
+        {% for key, ms in estados.items %}
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 border-0 shadow-sm {% if ms.online %}border-top border-4 border-success{% else %}border-top border-4 border-secondary{% endif %}">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="p-2 bg-light rounded text-{{ ms.color }}">
+                            <i class="fa-solid {{ ms.icono }} fa-xl"></i>
+                        </div>
+                        <div>
+                            {% if ms.online %}
+                            <span class="badge bg-success-subtle text-success border border-success px-2 py-1">
+                                <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i> ONLINE
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1">
+                                <i class="fa-regular fa-circle me-1" style="font-size: 8px;"></i> OFFLINE
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-1">{{ ms.nombre }}</h5>
+                    <div class="small text-muted mb-3">Puerto: <code>:{{ ms.puerto }}</code></div>
+
+                    <div class="bg-light p-2 rounded small mb-3 flex-grow-1">
+                        {% if ms.online %}
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Latencia:</span>
+                            <strong class="text-success">{{ ms.latencia_ms }} ms</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Uptime:</span>
+                            <span>{{ ms.data.uptime_segundos }} seg</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Estado:</span>
+                            <span class="badge bg-success">{{ ms.data.estado }}</span>
+                        </div>
+                        {% else %}
+                        <div class="text-muted text-center py-2">
+                            <i class="fa-solid fa-power-off me-1"></i> Servicio detenido
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {% if ms.online %}
+                        <a href="{{ ms.docs }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="fa-solid fa-book-open me-1"></i> Swagger API Docs
+                        </a>
+                        {% if key == 'telemedicina' %}
+                        <a href="http://127.0.0.1:8083/sala/demo-clinica" target="_blank" class="btn btn-info btn-sm text-white">
+                            <i class="fa-solid fa-video me-1"></i> Abrir Sala WebRTC
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <button class="btn btn-light btn-sm text-muted" disabled>
+                            Swagger Docs (No disponible)
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Catálogo de Endpoints de Microservicios -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check text-primary me-2"></i> Catálogo de Endpoints de Microservicios</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Microservicio</th>
+                        <th>Método</th>
+                        <th>Ruta Endpoint</th>
+                        <th>Propósito Técnico</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-primary">Notificaciones</span></td>
+                        <td><span class="badge bg-success">POST</span></td>
+                        <td><code>/api/v1/notificaciones/cita</code></td>
+                        <td>Despacha recordatorio automático por WhatsApp/SMS al dueño de la mascota al crear una cita en la agenda.</td>
+                        <td><a href="http://127.0.0.1:8081/docs" target="_blank" class="btn btn-link btn-sm p-0">Ver Docs</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-primary">Notificaciones</span></td>
+                        <td><span class="badge bg-success">POST</span></td>
+                        <td><code>/api/v1/notificaciones/vacuna</code></td>
+                        <td>Envía alerta preventiva de vacunas por vencer.</td>
+                        <td><a href="http://127.0.0.1:8081/docs" target="_blank" class="btn btn-link btn-sm p-0">Ver Docs</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-success">Facturación</span></td>
+                        <td><span class="badge bg-success">POST</span></td>
+                        <td><code>/api/v1/facturacion/emitir-comprobante</code></td>
+                        <td>Firma digital de XML UBL 2.1 y generación de código QR fiscal tras registrar una factura.</td>
+                        <td><a href="http://127.0.0.1:8082/docs" target="_blank" class="btn btn-link btn-sm p-0">Ver Docs</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-success">Facturación</span></td>
+                        <td><span class="badge bg-success">POST</span></td>
+                        <td><code>/api/v1/pagos/procesar-tarjeta</code></td>
+                        <td>Simulación de cobro mediante token de pasarela de pago (Stripe/Culqi).</td>
+                        <td><a href="http://127.0.0.1:8082/docs" target="_blank" class="btn btn-link btn-sm p-0">Ver Docs</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-info text-dark">Telemedicina</span></td>
+                        <td><span class="badge bg-warning text-dark">WSS</span></td>
+                        <td><code>/ws/sala/{sala_id}</code></td>
+                        <td>Servidor de señalización WebRTC en tiempo real y chat cifrado para videoconsultas.</td>
+                        <td><a href="http://127.0.0.1:8083/docs" target="_blank" class="btn btn-link btn-sm p-0">Ver Docs</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-warning text-dark">Reportes & BI</span></td>
+                        <td><span class="badge bg-success">POST</span></td>
+                        <td><code>/api/v1/reportes/balance-pdf</code></td>
+                        <td>Generación pesada de balances y estados financieros en background sin bloquear la web.</td>
+                        <td><a href="http://127.0.0.1:8084/docs" target="_blank" class="btn btn-link btn-sm p-0">Ver Docs</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sección de Entregables de Arquitectura -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-sitemap text-primary me-2"></i> Diagrama de Arquitectura Tecnológica E2E (Entregable)
+                </h5>
+                <small class="text-muted">Representación del ciclo de vida de la petición: Navegador &rarr; DNS/CDN &rarr; Nginx &rarr; Gunicorn &rarr; Django &rarr; Microservicios &rarr; MySQL/Redis</small>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="/static/arquitectura_vetsystem.png" download class="btn btn-outline-primary btn-sm">
+                    <i class="fa-solid fa-file-image me-1"></i> Descargar PNG (300 DPI)
+                </a>
+                <a href="/static/arquitectura_vetsystem.pdf" download class="btn btn-outline-danger btn-sm">
+                    <i class="fa-solid fa-file-pdf me-1"></i> Descargar PDF
+                </a>
+                <a href="/static/arquitectura_vetsystem.drawio" download class="btn btn-outline-warning btn-sm">
+                    <i class="fa-solid fa-diagram-project me-1"></i> Descargar Draw.io (.drawio)
+                </a>
+                <a href="/static/arquitectura_vetsystem.html" target="_blank" class="btn btn-info btn-sm text-white">
+                    <i class="fa-solid fa-up-right-from-square me-1"></i> Ver Interactivo
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-3 text-center bg-light">
+            <a href="/static/arquitectura_vetsystem.html" target="_blank" title="Clic para abrir en pantalla completa">
+                <img src="/static/arquitectura_vetsystem.png" alt="Arquitectura VetSystem" class="img-fluid rounded shadow-sm border bg-white p-2" style="max-height: 480px; width: auto; object-fit: contain;">
+            </a>
+            <div class="small text-muted mt-2">
+                <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Haga clic sobre la imagen para abrir el visor interactivo en una pestaña nueva.
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
