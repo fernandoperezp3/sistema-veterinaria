@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Panel de Control{% endblock %}
+{% block page_subtitle %}Bienvenido, <span class="fw-bold">{{ request.user.username }}</span> &mdash; hoy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos base de las tarjetas del nuevo dashboard */
+    .stat-card {
+        border-radius: 20px;
+        color: white;
+        padding: 24px;
+        border: none;
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bg-info-custom {
+        background: linear-gradient(135deg, #0ba3db, #0380ad);
+    }
+
+    .bg-purple-custom {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    }
+
+    .bg-success-custom {
+        background: linear-gradient(135deg, #10b981, #047857);
+    }
+
+    .bg-warning-custom {
+        background: linear-gradient(135deg, #f59e0b, #b45309);
+    }
+
+    .stat-card-circle {
+        position: absolute;
+        right: -30px;
+        top: -30px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .stat-card-circle-2 {
+        position: absolute;
+        right: -10px;
+        bottom: -50px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .stat-card h6 {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+
+    .stat-card h2 {
+        font-size: 36px;
+        font-weight: 700;
+        margin: 10px 0 5px 0;
+    }
+
+    .stat-card p {
+        font-size: 13px;
+        opacity: 0.9;
+        margin-bottom: 20px;
+    }
+
+    .stat-card .badge-custom {
+        background-color: rgba(255, 255, 255, 0.25);
+        border-radius: 30px;
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        width: max-content;
+    }
+
+    .panel-card {
+        background: white;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+    }
+
+    .profile-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: #8b5cf6;
+        color: white;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .profile-status {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 20px;
+        height: 20px;
+        background: #10b981;
+        border: 3px solid white;
+        border-radius: 50%;
+    }
+
+    .stat-divider {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
+        text-align: center;
+    }
+
+    .mini-badge {
+        background-color: #8b5cf6;
+        color: white;
+        border-radius: 12px;
+        padding: 2px 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Top Header specific actions -->
+<div class="d-flex justify-content-end mb-4" style="margin-top: -80px;">
+    <button class="btn btn-primary rounded-pill px-4 py-2 me-2"
+        style="background-color: #17bbcf; border:none; font-weight:600;"><i class="fa-solid fa-plus me-2"></i>Nueva
+        Cita</button>
+    <button class="btn text-secondary rounded-pill px-4 py-2 bg-white"
+        style="border: 1px solid #e2e8f0; font-weight:600;"><i class="fa-solid fa-user-plus me-2"></i>Nuevo
+        Cliente</button>
+</div>
+
+<!-- KPIs Row -->
+<div class="row gx-3 mb-4">
+    <!-- Citas Hoy -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card bg-info-custom h-100">
+            <div class="stat-card-circle"></div>
+            <div class="stat-card-circle-2"></div>
+            <h6>Citas Hoy</h6>
+            <h2>{{ citas_hoy|default:0 }}</h2>
+            <p>Activas ahora</p>
+            <div class="badge-custom"><i class="fa-solid fa-circle text-danger me-2" style="font-size: 8px;"></i> Live
+            </div>
+        </div>
+    </div>
+
+    <!-- Pacientes -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card bg-purple-custom h-100">
+            <div class="stat-card-circle"></div>
+            <div class="stat-card-circle-2"></div>
+            <h6>Pacientes</h6>
+            <h2>{{ total_mascotas|default:0 }}</h2>
+            <p>+{{ mascotas_mes|default:0 }} este mes</p>
+            <div class="badge-custom"><i class="fa-solid fa-arrow-up me-1"></i> {{ mascotas_mes|default:0 }}</div>
+        </div>
+    </div>
+
+    <!-- Ingresos -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card bg-success-custom h-100">
+            <div class="stat-card-circle"></div>
+            <div class="stat-card-circle-2"></div>
+            <h6>Ingresos Mes</h6>
+            <h2>{{ configuracion.simbolo_moneda }} {{ ingresos_mes|floatformat:0|default:0 }}</h2>
+            <p>Ticket: {{ configuracion.simbolo_moneda }} {{ ticket_promedio|default:0 }}</p>
+            <div class="badge-custom"><i class="fa-solid fa-arrow-up me-1"></i> Anual: {{ configuracion.simbolo_moneda }} {{ ingresos_anio|floatformat:0 }}</div>
+        </div>
+    </div>
+
+    <!-- Inventario -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card bg-warning-custom h-100">
+            <div class="stat-card-circle"></div>
+            <div class="stat-card-circle-2"></div>
+            <h6>Inventario</h6>
+            <h2>{{ productos_activos|default:0 }}</h2>
+            {% if stock_bajo > 0 %}
+            <p>Stock bajo: <strong>{{ stock_bajo }}</strong> <i
+                    class="fa-solid fa-triangle-exclamation text-warning"></i></p>
+            {% else %}
+            <p>Stock OK <i class="fa-solid fa-check"></i></p>
+            {% endif %}
+            <div class="badge-custom">Productos activos</div>
+        </div>
+    </div>
+</div>
+
+<div class="row gx-3">
+    <!-- Gráfico y Resúmenes -->
+    <div class="col-lg-8">
+        <!-- Main Line Chart -->
+        <div class="panel-card mb-4" style="height: 380px;">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h5 class="fw-bold mb-1">Actividad Semanal</h5>
+                    <p class="text-muted small mb-0">Citas vs Ingresos &mdash; últimos 7 días</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="small fw-semibold text-muted"><span class="d-inline-block rounded-circle me-1"
+                            style="width: 8px; height: 8px; background-color: #8b5cf6"></span> Citas</div>
+                    <div class="small fw-semibold text-muted"><span class="d-inline-block rounded-circle me-1"
+                            style="width: 8px; height: 8px; background-color: #f59e0b"></span> Ingresos</div>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">7 días</span>
+                </div>
+            </div>
+            <div style="position: relative; height: 250px; width: 100%;">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bottom Row (Resumen Financiero y Actividad por semana) -->
+        <div class="row gx-3">
+            <div class="col-md-6 mb-4">
+                <div class="panel-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Resumen Financiero</h6>
+                            <p class="text-muted small mb-0">Datos del periodo actual</p>
+                        </div>
+                        <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+                    </div>
+                    <div class="d-flex gap-3 mt-4">
+                        <div class="flex-fill rounded-3 p-3" style="background-color: rgba(139, 92, 246, 0.1);">
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mb-2"
+                                style="width:30px; height:30px; color: #8b5cf6"><i class="fa-solid fa-plus"></i></div>
+                            <!-- placeholder for data -->
+                        </div>
+                        <div class="flex-fill rounded-3 p-3" style="background-color: rgba(244, 63, 94, 0.1);">
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mb-2"
+                                style="width:30px; height:30px; color: #f43f5e"><i class="fa-solid fa-minus"></i></div>
+                            <!-- placeholder for data -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="panel-card h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Actividad por Semana</h6>
+                            <p class="text-muted small mb-0">Distribución diaria</p>
+                        </div>
+                        <div class="small fw-semibold text-muted text-nowrap">
+                            <span class="d-inline-block rounded-circle me-1"
+                                style="width: 6px; height: 6px; background-color: #8b5cf6"></span> Citas
+                            <span class="d-inline-block rounded-circle ms-2 me-1"
+                                style="width: 6px; height: 6px; background-color: #10b981"></span> Ingresos
+                        </div>
+                    </div>
+                    <!-- Placeholder Chart / Empty space -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Content -->
+    <div class="col-lg-4">
+        <!-- Admin Profile -->
+        <div class="panel-card mb-4"
+            style="background: linear-gradient(180deg, rgba(139, 92, 246, 0.03) 0%, rgba(255, 255, 255, 1) 100%);">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="profile-avatar mb-0 shadow-sm" style="width: 65px; height: 65px; font-size: 24px;">
+                    {{ request.user.username.0|upper }}
+                    <div class="profile-status" style="width: 16px; height: 16px;"></div>
+                </div>
+                <div class="text-start">
+                    <h5 class="fw-bold mb-0 text-dark">{{ request.user.username }}</h5>
+                    <p class="text-muted small mb-0">{{ request.user.email|default:"Administrador del sistema" }}</p>
+                    <span class="badge bg-light text-primary border mt-2"><i
+                            class="fa-solid fa-shield-halved me-1"></i>Perfil Base</span>
+                </div>
+            </div>
+
+            <div class="row g-2 text-center">
+                <div class="col-6">
+                    <div class="p-3 rounded-4 border" style="background:#f8fafc">
+                        <i class="fa-solid fa-paw mb-2" style="color: #8b5cf6; font-size: 20px;"></i>
+                        <h4 class="fw-bold mb-0 text-dark" style="letter-spacing: -1px;">{{ total_mascotas|default:0 }}
+                        </h4>
+                        <span class="text-muted"
+                            style="font-size: 11px; text-transform: uppercase; font-weight:600; letter-spacing: 0.5px;">Pacientes</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded-4 border" style="background:#f8fafc">
+                        <i class="fa-solid fa-calendar-day mb-2" style="color: #0bb8c8; font-size: 20px;"></i>
+                        <h4 class="fw-bold mb-0 text-dark" style="letter-spacing: -1px;">{{ citas_hoy|default:0 }}</h4>
+                        <span class="text-muted"
+                            style="font-size: 11px; text-transform: uppercase; font-weight:600; letter-spacing: 0.5px;">Citas
+                            Hoy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximas Citas -->
+        <div class="panel-card" style="min-height: 250px;">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-clock-rotate-left me-2"
+                        style="color:#0bb8c8;"></i>Próximas Citas</h6>
+                <span class="badge rounded-pill px-3 py-2"
+                    style="background:rgba(11, 184, 200, 0.1); color:#0bb8c8; font-weight:600;">Agenda de Hoy</span>
+            </div>
+
+            {% if proximas_citas %}
+            <div class="position-relative ms-2 mt-4" style="border-left: 2px dashed #f1f5f9; padding-left: 20px;">
+                {% for cita in proximas_citas %}
+                <div class="mb-4 position-relative">
+                    <!-- Timeline Dot -->
+                    <span class="position-absolute translate-middle rounded-circle shadow-sm"
+                        style="left: -21px; top: 15px; width: 14px; height: 14px; background: {% if cita.estado == 'PENDIENTE' %}#94a3b8{% elif cita.estado == 'EN_ESPERA' %}#f59e0b{% elif cita.estado == 'EN_ATENCION' %}#3b82f6{% else %}#10b981{% endif %}; border: 3px solid white;"></span>
+
+                    <div class="p-3 rounded-4 border" style="background: white; position: relative;">
+                        <!-- Time badge -->
+                        <div class="position-absolute top-0 end-0 translate-middle-y me-3">
+                            <span class="badge bg-dark rounded-pill px-3 shadow-sm border border-light border-2"
+                                style="font-size: 11px; font-weight: 600; letter-spacing: 0.5px;">
+                                {{ cita.hora|time:"H:i" }}
+                            </span>
+                        </div>
+
+                        <h6 class="fw-bold text-dark mb-2 mt-1">{{ cita.mascota.nombre }}</h6>
+
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <span class="badge bg-light text-secondary border fw-normal">
+                                <i class="fa-solid fa-tag me-1 text-muted"></i>
+                                {{ cita.mascota.get_especie_display }}
+                            </span>
+                            <span class="badge bg-light text-primary border fw-normal">
+                                <i class="fa-solid fa-stethoscope me-1" style="opacity:0.7;"></i>
+                                {{ cita.get_tipo_display }}
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <span class="text-muted text-truncate" style="font-size: 11px; max-width: 120px;"
+                                title="{{ cita.mascota.cliente.nombre_completo }}">
+                                <i class="fa-regular fa-user me-1"></i>
+                                {{ cita.mascota.cliente.nombre_completo }}
+                            </span>
+                            <!-- ESTADO -->
+                            <span class="badge rounded-pill"
+                                style="font-size:10px; font-weight:700; background: {% if cita.estado == 'PENDIENTE' %}rgba(148,163,184,.15); color: #64748b;{% elif cita.estado == 'EN_ESPERA' %}rgba(245,158,11,.15); color: #b45309;{% elif cita.estado == 'EN_ATENCION' %}rgba(59,130,246,.15); color: #1d4ed8;{% else %}rgba(16,185,129,.15); color: #047857;{% endif %}">
+                                {{ cita.get_estado_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'agenda_lista' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-4">Ver toda
+                    la agenda</a>
+            </div>
+            {% else %}
+            <div class="text-center text-muted" style="margin-top: 40px; margin-bottom: 20px;">
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style="width: 80px; height: 80px;">
+                    <i class="fa-regular fa-calendar-check fs-2" style="color: #cbd5e1;"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">Día Despejado</h6>
+                <p class="small mb-4">No hay más citas agendadas para hoy.</p>
+                <a href="{% url 'cita_crear' %}" class="btn btn-primary rounded-pill px-4 fw-semibold"
+                    style="background:#0bb8c8; border:none; box-shadow: 0 4px 10px rgba(11, 184, 200, 0.3);">Agendar
+                    Cita</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Configuración general Chart.js
+    Chart.defaults.font.family = 'Inter';
+    Chart.defaults.color = '#94a3b8';
+
+    // Line Chart Minimalista
+    const ctx = document.getElementById('mainChart').getContext('2d');
+
+    // Crear un gradiente sutil para el área debajo de la línea
+    const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+    gradient.addColorStop(0, 'rgba(139, 92, 246, 0.2)');
+    gradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels| safe }},
+        datasets: [
+        {
+            data: {{ data_citas| safe }},
+        borderColor: '#8b5cf6',
+        backgroundColor: gradient,
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#8b5cf6',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4
+                },
+        {
+            data: {{ data_ingresos| safe }},
+        borderColor: '#f59e0b',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: false,
+        pointBackgroundColor: '#f59e0b',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4
+                }
+    ]
+        },
+        options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: {
+                grid: { display: false },
+                border: { display: false }
+            },
+            y: {
+                display: false,
+                min: 0,
+                max: 10
+            }
+        },
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                left: 10,
+                right: 10
+            }
+        }
+    }
+    });
+
+</script>
+{% endblock %}
