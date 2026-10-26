@@ -1,0 +1,13 @@
+venv
+.venv
+**/__pycache__
+*.pyc
+db.sqlite3
+backups
+staticfiles
+microservicios/reportes_bi/generados
+.vscode
+.git
+*.pdf
+*.png
+*.drawio
