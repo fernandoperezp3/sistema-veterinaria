@@ -1,0 +1,9 @@
+{% if form.errors %}
+<div class="alert alert-danger py-2 mb-3">
+    <div class="fw-semibold mb-1"><i class="fa-solid fa-circle-exclamation me-1"></i>Revise los siguientes datos:</div>
+    <ul class="mb-0 small">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        {% for field in form %}{% for error in field.errors %}<li><strong>{{ field.label }}:</strong> {{ error }}</li>{% endfor %}{% endfor %}
+    </ul>
+</div>
+{% endif %}

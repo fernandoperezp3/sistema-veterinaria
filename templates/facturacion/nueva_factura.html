@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}Nueva Factura{% endblock %}
+{% block page_title %}Nueva Factura{% endblock %}
+{% block page_subtitle %}Registrar venta o servicio{% endblock %}
+
+{% block extra_css %}
+<style>
+    .item-row td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method="post" id="facturaForm">
+    {% csrf_token %}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Cabecera -->
+            <div class="panel-card mb-4">
+                <h6 class="fw-bold mb-3" style="color:#10b981;"><i class="fa-solid fa-user me-2"></i>Datos del Cliente
+                </h6>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Cliente</label>
+                        <select name="cliente" class="form-select">
+                            <option value="">— Venta sin cliente (anónimo) —</option>
+                            {% for c in clientes %}
+                            <option value="{{ c.pk }}">{{ c.nombre_completo }} — {{ c.dni }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Método de Pago</label>
+                        <select name="metodo_pago" class="form-select">
+                            <option value="EFECTIVO">Efectivo</option>
+                            <option value="TARJETA">Tarjeta (POS)</option>
+                            <option value="TRANSFERENCIA">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ítems -->
+            <div class="panel-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0" style="color:#10b981;"><i class="fa-solid fa-list me-2"></i>Detalle de la
+                        Venta</h6>
+                    <button type="button" class="btn btn-success btn-sm rounded-pill" onclick="agregarFila()"
+                        style="border:none;">
+                        <i class="fa-solid fa-plus me-1"></i>Agregar Ítem
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle" id="tablaItems">
+                        <thead>
+                            <tr style="background:#f8fafc;font-size:12px;text-transform:uppercase;color:#94a3b8;">
+                                <th>Producto (opcional)</th>
+                                <th style="width:35%">Descripción</th>
+                                <th style="width:8%">Cant.</th>
+                                <th style="width:12%">Precio</th>
+                                <th style="width:12%">Subtotal</th>
+                                <th style="width:5%"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            <tr class="item-row">
+                                <td><select name="producto_id[]" class="form-select form-select-sm"
+                                        onchange="llenarPrecio(this)">
+                                        <option value="">— Servicio libre —</option>{% for p in productos %}<option
+                                            value="{{ p.pk }}" data-nombre="{{ p.nombre }}"
+                                            data-precio="{{ p.precio_venta|stringformat:'s' }}">{{ p.nombre }} ({{ configuracion.simbolo_moneda }} {{ p.precio_venta|floatformat:2 }} · Stock: {{ p.stock_actual }})
+                                        </option>{% endfor %}
+                                    </select></td>
+                                <td><input type="text" name="descripcion[]" class="form-control form-control-sm"
+                                        placeholder="Descripción del servicio o producto" required></td>
+                                <td><input type="number" name="cantidad[]" class="form-control form-control-sm cant"
+                                        value="1" min="1" oninput="calcularSubtotales()"></td>
+                                <td><input type="number" name="precio[]" class="form-control form-control-sm precio"
+                                        value="0.00" step="0.01" min="0" oninput="calcularSubtotales()"></td>
+                                <td><span class="subtotal-val fw-bold">{{ configuracion.simbolo_moneda }} 0.00</span></td>
+                                <td><button type="button" class="btn btn-sm btn-outline-danger"
+                                        onclick="quitarFila(this)"><i class="fa-solid fa-xmark"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="col-lg-4">
+            <div class="panel-card mb-4" style="border-left:4px solid #10b981;">
+                <h6 class="fw-bold mb-4">Resumen</h6>
+                <div class="d-flex justify-content-between mb-2"><span class="text-muted">Subtotal</span><span
+                        id="res-subtotal" class="fw-semibold">{{ configuracion.simbolo_moneda }} 0.00</span></div>
+                <div class="d-flex justify-content-between mb-2"><span class="text-muted">{{ configuracion.nombre_impuesto }} ({{ configuracion.porcentaje_impuesto|floatformat:"-2" }}%)</span><span
+                        id="res-igv" class="fw-semibold">{{ configuracion.simbolo_moneda }} 0.00</span></div>
+                <hr>
+                <div class="d-flex justify-content-between"><span class="fw-bold fs-5">Total</span><span id="res-total"
+                        class="fw-bold fs-5 text-success">{{ configuracion.simbolo_moneda }} 0.00</span></div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success rounded-pill py-2 fw-bold" style="border:none;">
+                        <i class="fa-solid fa-file-invoice-dollar me-2"></i>Emitir Factura
+                    </button>
+                    <a href="{% url 'factura_lista' %}" class="btn btn-outline-secondary rounded-pill mt-2">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+{{ productos_data|json_script:"productos-data" }}
+{{ factura_js|json_script:"factura-config" }}
+<script>
+    const productosData = JSON.parse(document.getElementById('productos-data').textContent);
+    const facturaConfig = JSON.parse(document.getElementById('factura-config').textContent);
+    const moneda = (v) => facturaConfig.simbolo + ' ' + v.toFixed(2);
+
+    function agregarFila() {
+        const tbody = document.getElementById('itemsBody');
+        const primera = tbody.querySelector('tr');
+        const nueva = primera.cloneNode(true);
+        nueva.querySelector('select').value = '';
+        nueva.querySelector('input[name="descripcion[]"]').value = '';
+        nueva.querySelector('input[name="cantidad[]"]').value = 1;
+        nueva.querySelector('input[name="cantidad[]"]').removeAttribute('max');
+        nueva.querySelector('input[name="precio[]"]').value = '0.00';
+        nueva.querySelector('.subtotal-val').textContent = moneda(0);
+        tbody.appendChild(nueva);
+    }
+
+    function quitarFila(btn) {
+        const rows = document.querySelectorAll('#itemsBody tr');
+        if (rows.length > 1) { btn.closest('tr').remove(); calcularSubtotales(); }
+    }
+
+    function llenarPrecio(sel) {
+        const row = sel.closest('tr');
+        const pk = sel.value;
+        const cant = row.querySelector('input[name="cantidad[]"]');
+        if (pk && productosData[pk]) {
+            row.querySelector('input[name="descripcion[]"]').value = productosData[pk].nombre;
+            row.querySelector('input[name="precio[]"]').value = productosData[pk].precio.toFixed(2);
+            cant.max = productosData[pk].stock;
+        } else {
+            cant.removeAttribute('max');
+        }
+        calcularSubtotales();
+    }
+
+    function calcularSubtotales() {
+        let subtotal = 0;
+        document.querySelectorAll('#itemsBody tr').forEach(row => {
+            const cant = parseFloat(row.querySelector('.cant').value) || 0;
+            const precio = parseFloat(row.querySelector('.precio').value) || 0;
+            const sub = cant * precio;
+            row.querySelector('.subtotal-val').textContent = moneda(sub);
+            subtotal += sub;
+        });
+        const impuesto = Math.round(subtotal * facturaConfig.tasa * 100) / 100;
+        document.getElementById('res-subtotal').textContent = moneda(subtotal);
+        document.getElementById('res-igv').textContent = moneda(impuesto);
+        document.getElementById('res-total').textContent = moneda(subtotal + impuesto);
+    }
+</script>
+{% endblock %}
