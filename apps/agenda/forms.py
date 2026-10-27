@@ -5,6 +5,11 @@ from django.contrib.auth.models import User
 
 
 class CitaForm(forms.ModelForm):
+    es_teleconsulta = forms.BooleanField(
+        required=False, label='Es teleconsulta (videollamada)',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+    )
+
     class Meta:
         model = Cita
         fields = ['mascota', 'veterinario', 'fecha', 'hora', 'motivo', 'tipo', 'estado', 'observaciones']
@@ -25,3 +30,9 @@ class CitaForm(forms.ModelForm):
         self.fields['mascota'].label_from_instance = lambda obj: f"{obj.nombre} ({obj.cliente.nombre_completo})"
         self.fields['veterinario'].queryset = User.objects.filter(is_staff=True)
         self.fields['veterinario'].required = False
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get('es_teleconsulta'):
+            cleaned['tipo'] = 'CONSULTA'
+        return cleaned

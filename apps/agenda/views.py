@@ -8,6 +8,15 @@ from apps.agenda.models import Cita
 from apps.agenda.forms import CitaForm
 
 
+
+def _mensaje_whatsapp(request, respuesta):
+    """Si el microservicio de notificaciones devolvió un enlace wa.me, lo muestra como botón."""
+    enlace = ((respuesta or {}).get('detalle') or {}).get('enlace_whatsapp')
+    if enlace:
+        messages.info(request, enlace, extra_tags='whatsapp')
+    elif respuesta:
+        messages.warning(request, 'El cliente no tiene un teléfono válido; no se pudo preparar el WhatsApp.')
+
 @login_required
 def agenda_lista(request):
     fecha_filtro = request.GET.get('fecha', '')
@@ -41,11 +50,50 @@ def agenda_lista(request):
     return render(request, 'agenda/lista.html', context)
 
 
+def _crear_teleconsulta(cita):
+    from apps.core.services_client import MicroservicesClient
+    from apps.telemedicina.models import ConsultaVirtual
+    if hasattr(cita, 'consulta_virtual'):
+        return cita.consulta_virtual
+    veterinario = cita.veterinario.get_full_name() if cita.veterinario else 'Dr. Veterinario'
+    resp = MicroservicesClient.crear_sala_telemedicina(
+        cita_id=cita.id,
+        veterinario=veterinario or 'Dr. Veterinario',
+        paciente=cita.mascota.nombre,
+        propietario=cita.mascota.cliente.nombre_completo,
+    )
+    if not (resp and resp.get('success')):
+        return None
+    return ConsultaVirtual.objects.create(
+        cita=cita,
+        plataforma='OTRO',
+        enlace_reunion=resp['sala']['url_acceso'],
+        codigo_acceso=resp['sala']['sala_id'],
+        estado_conexion='PROGRAMADA',
+    )
+
+
 @login_required
 def cita_crear(request):
-    form = CitaForm(request.POST or None)
+    inicial = {}
+    if request.GET.get('mascota'):
+        inicial['mascota'] = request.GET.get('mascota')
+    if request.GET.get('tipo'):
+        inicial['tipo'] = request.GET.get('tipo')
+    if request.GET.get('teleconsulta'):
+        inicial['es_teleconsulta'] = True
+    form = CitaForm(request.POST or None, initial=inicial)
     if form.is_valid():
-        cita = form.save()
+        cita = form.save(commit=False)
+        if form.cleaned_data.get('es_teleconsulta'):
+            cita.tipo = 'CONSULTA'
+        cita.save()
+        if form.cleaned_data.get('es_teleconsulta'):
+            sala = _crear_teleconsulta(cita)
+            if sala:
+                messages.info(request, f'Teleconsulta creada para {cita.mascota.nombre}. El cliente la verá en su portal.')
+            else:
+                messages.warning(request, 'La cita se guardó, pero el microservicio de telemedicina no respondió. Prográmala desde Telemedicina.')
         
         # Integración con Microservicio de Notificaciones (Puerto 8081)
         from apps.core.services_client import MicroservicesClient
@@ -59,7 +107,8 @@ def cita_crear(request):
             motivo=getattr(cita, 'motivo', 'Consulta General')
         )
         if notif:
-            messages.success(request, f'Cita registrada para {cita.mascota.nombre} el {cita.fecha}. (Recordatorio despachado por Microservicio de Notificaciones)')
+            messages.success(request, f'Cita registrada para {cita.mascota.nombre} el {cita.fecha}. Recordatorio preparado por el Microservicio de Notificaciones.')
+            _mensaje_whatsapp(request, notif)
         else:
             messages.success(request, f'Cita registrada para {cita.mascota.nombre} el {cita.fecha}.')
         return redirect('agenda_lista')
@@ -121,7 +170,8 @@ def cita_notificar_microservicio(request, pk):
         motivo=getattr(cita, 'motivo', 'Consulta General')
     )
     if resp and resp.get('success'):
-        messages.success(request, f'Notificación despachada por WhatsApp mediante Microservicio (Puerto 8081) para {cita.mascota.nombre}.')
+        messages.success(request, f'Recordatorio de la cita de {cita.mascota.nombre} preparado por el Microservicio de Notificaciones (8081).')
+        _mensaje_whatsapp(request, resp)
     else:
         messages.warning(request, f'El Microservicio de Notificaciones está offline o no respondió. La cita sigue registrada.')
     return redirect('agenda_lista')
