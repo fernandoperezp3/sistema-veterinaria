@@ -18,7 +18,7 @@ class ProveedorForm(forms.ModelForm):
         fields = ['nombre', 'ruc', 'telefono', 'email', 'direccion', 'contacto']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'ruc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'RUC'}),
+            'ruc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'NIT'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
