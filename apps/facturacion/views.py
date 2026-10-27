@@ -203,10 +203,36 @@ def factura_crear(request):
             subtotal=factura.subtotal,
             items=items_payload,
         )
+        campos = []
+        if cpe and cpe.get('comprobante'):
+            comp = cpe['comprobante']
+            factura.hash_cpe = comp.get('hash_cpe', '')
+            factura.firma_digital = comp.get('firma_digital', '')
+            factura.estado_fiscal = comp.get('estado_sunat_sat', '')
+            factura.codigo_qr = comp.get('codigo_qr_texto', '')
+            campos += ['hash_cpe', 'firma_digital', 'estado_fiscal', 'codigo_qr']
+
+        pago = None
+        if factura.metodo_pago == 'TARJETA':
+            pago = MicroservicesClient.procesar_pago_tarjeta(
+                numero_factura=factura.numero,
+                monto=factura.total,
+                titular=factura.cliente.nombre_completo if factura.cliente else "Cliente General",
+            )
+            if pago and pago.get('success'):
+                factura.autorizacion_pago = pago.get('codigo_autorizacion', '')
+                campos.append('autorizacion_pago')
+        if campos:
+            factura.save(update_fields=campos)
+
         if cpe:
-            messages.success(request, f'Factura {factura.numero} generada y timbrada digitalmente por Microservicio Fiscal (UBL 2.1).')
+            messages.success(request, f'Factura {factura.numero} generada y firmada electrónicamente por el microservicio fiscal (hash {factura.hash_cpe[:12]}…).')
         else:
-            messages.success(request, f'Factura {factura.numero} generada por {config.simbolo_moneda} {factura.total}.')
+            messages.success(request, f'Factura {factura.numero} generada por {config.simbolo_moneda} {factura.total}. El microservicio fiscal no respondió.')
+        if pago and pago.get('success'):
+            messages.info(request, f"Pago con tarjeta aprobado por la pasarela ({pago.get('pasarela')}). Autorización {factura.autorizacion_pago}.")
+        elif factura.metodo_pago == 'TARJETA':
+            messages.warning(request, 'La pasarela de pagos no respondió; registre la autorización del POS manualmente.')
         return redirect('factura_detalle', pk=factura.pk)
 
     return render(request, 'facturacion/nueva_factura.html', contexto)

@@ -7,6 +7,7 @@ import subprocess
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.db import connection
 from django.db.models import Sum
 from django.http import FileResponse
@@ -46,18 +47,24 @@ def dashboard(request):
         'mascota__cliente', 'veterinario'
     ).order_by('hora')[:5]
 
-    dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-    labels = []
-    data_citas = []
-    data_ingresos = []
-    for i in range(6, -1, -1):
-        dia = hoy - datetime.timedelta(days=i)
-        labels.append(dias_semana[dia.weekday()])
-        data_citas.append(Cita.objects.filter(fecha=dia, is_active=True).count())
-        ing_dia = Factura.objects.filter(
-            estado='PAGADA', fecha__date=dia
-        ).aggregate(t=Sum('total'))['t'] or 0
-        data_ingresos.append(float(ing_dia))
+    clave_grafico = f"dashboard:grafico:{hoy.isoformat()}"
+    grafico = cache.get(clave_grafico)
+    if grafico is None:
+        dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+        labels = []
+        data_citas = []
+        data_ingresos = []
+        for i in range(6, -1, -1):
+            dia = hoy - datetime.timedelta(days=i)
+            labels.append(dias_semana[dia.weekday()])
+            data_citas.append(Cita.objects.filter(fecha=dia, is_active=True).count())
+            ing_dia = Factura.objects.filter(
+                estado='PAGADA', fecha__date=dia
+            ).aggregate(t=Sum('total'))['t'] or 0
+            data_ingresos.append(float(ing_dia))
+        grafico = (labels, data_citas, data_ingresos)
+        cache.set(clave_grafico, grafico, 60)
+    labels, data_citas, data_ingresos = grafico
 
     context = {
         'citas_hoy': citas_hoy,
@@ -264,5 +271,7 @@ def microservicios_panel(request):
         'total_online': total_online,
         'total_servicios': len(estados),
         'titulo': 'Monitor de Microservicios',
+        'notificaciones': (MicroservicesClient.historial('notificaciones', '/api/v1/notificaciones/historial') or {}).get('historial', [])[:15],
+        'comprobantes': (MicroservicesClient.historial('facturacion', '/api/v1/facturacion/comprobantes') or {}).get('comprobantes', [])[:15],
     }
     return render(request, 'core/microservicios_panel.html', context)

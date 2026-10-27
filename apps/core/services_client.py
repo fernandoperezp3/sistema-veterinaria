@@ -84,8 +84,8 @@ class MicroservicesClient:
             "cliente_nombre": cliente_nombre,
             "telefono": str(telefono or "000000000"),
             "mascota_nombre": mascota_nombre,
-            "fecha": str(fecha),
-            "hora": str(hora),
+            "fecha": fecha.strftime("%d/%m/%Y") if hasattr(fecha, "strftime") else str(fecha),
+            "hora": hora.strftime("%H:%M") if hasattr(hora, "strftime") else str(hora)[:5],
             "motivo": motivo or "Consulta General",
             "canal": "WHATSAPP"
         }
@@ -128,6 +128,30 @@ class MicroservicesClient:
         }
         try:
             res = requests.post(f"{cls.SERVICES['facturacion']['url']}/api/v1/facturacion/emitir-comprobante", json=payload, timeout=2.0)
+            return res.json() if res.status_code == 200 else None
+        except Exception:
+            return None
+
+    @classmethod
+    def procesar_pago_tarjeta(cls, numero_factura, monto, titular, tarjeta="4242", moneda="GTQ"):
+        payload = {
+            "factura_numero": numero_factura,
+            "monto": float(monto),
+            "moneda": moneda,
+            "numero_tarjeta_enmascarado": f"**** **** **** {tarjeta[-4:]}",
+            "titular": titular or "Cliente General",
+            "pasarela": "STRIPE",
+        }
+        try:
+            res = requests.post(f"{cls.SERVICES['facturacion']['url']}/api/v1/pagos/procesar-tarjeta", json=payload, timeout=2.0)
+            return res.json() if res.status_code == 200 else None
+        except Exception:
+            return None
+
+    @classmethod
+    def historial(cls, servicio, ruta):
+        try:
+            res = requests.get(f"{cls.SERVICES[servicio]['url']}{ruta}", timeout=1.5)
             return res.json() if res.status_code == 200 else None
         except Exception:
             return None
