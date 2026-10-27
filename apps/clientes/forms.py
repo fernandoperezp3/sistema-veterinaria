@@ -9,7 +9,7 @@ class ClienteForm(forms.ModelForm):
         widgets = {
             'nombres': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
             'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
-            'dni': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'DNI / Documento'}),
+            'dni': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'DPI / Documento'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
             'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Dirección'}),
@@ -30,4 +30,18 @@ class MascotaForm(forms.ModelForm):
             'color': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Color/pelaje'}),
             'microchip': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'N° de microchip'}),
             'foto': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+
+class PerfilClienteForm(forms.ModelForm):
+    class Meta:
+        model = Cliente
+        fields = ['nombres', 'apellidos', 'dni', 'telefono', 'direccion']
+        labels = {'dni': 'DPI / Documento', 'telefono': 'Teléfono', 'direccion': 'Dirección'}
+        widgets = {
+            'nombres': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control'}),
+            'dni': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de DPI'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '5555-5555'}),
+            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
