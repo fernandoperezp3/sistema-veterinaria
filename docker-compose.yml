@@ -5,6 +5,7 @@ x-django-env: &django-env
   DB_USER: root
   DB_PASSWORD: ""
   MICROSERVICES_HOST: 127.0.0.1
+  REDIS_URL: redis://redis:6379/0
   MS_NOTIFICACIONES_URL: http://ms-notificaciones:8081
   MS_FACTURACION_URL: http://ms-facturacion:8082
   MS_TELEMEDICINA_URL: http://ms-telemedicina:8083

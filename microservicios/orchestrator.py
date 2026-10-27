@@ -57,7 +57,7 @@ def main():
             "uvicorn",
             s["app"],
             "--host",
-            "127.0.0.1",
+            "0.0.0.0",
             "--port",
             str(s["puerto"]),
             "--log-level",
