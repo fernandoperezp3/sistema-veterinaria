@@ -45,6 +45,17 @@
                         <label class="form-label fw-semibold">Observaciones</label>
                         {{ form.observaciones }}
                     </div>
+                    {% if not cita %}
+                    <div class="col-12">
+                        <div class="form-check form-switch p-3 ps-5 rounded" style="background:#ecfeff;border:1px solid #a5f3fc;">
+                            {{ form.es_teleconsulta }}
+                            <label class="form-check-label fw-semibold" for="{{ form.es_teleconsulta.id_for_label }}">
+                                <i class="fa-solid fa-video me-1 text-info"></i>Es teleconsulta (videollamada)
+                            </label>
+                            <div class="small text-muted">Crea la sala automáticamente; el cliente verá el botón "Unirse a la videollamada" en su portal.</div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-primary rounded-pill px-4"
