@@ -8,6 +8,15 @@ from apps.agenda.models import Cita
 from apps.clientes.models import Mascota
 
 
+
+def _mensaje_whatsapp(request, respuesta):
+    """Si el microservicio de notificaciones devolvió un enlace wa.me, lo muestra como botón."""
+    enlace = ((respuesta or {}).get('detalle') or {}).get('enlace_whatsapp')
+    if enlace:
+        messages.info(request, enlace, extra_tags='whatsapp')
+    elif respuesta:
+        messages.warning(request, 'El cliente no tiene un teléfono válido; no se pudo preparar el WhatsApp.')
+
 @login_required
 def historia_lista(request):
     q = request.GET.get('q', '')
@@ -117,7 +126,8 @@ def vacuna_crear(request, mascota_pk=None):
             fecha_limite=vacuna.fecha_proxima_dosis or vacuna.fecha_aplicacion
         )
         if notif:
-            messages.success(request, f'Vacuna registrada y recordatorio preventivo despachado vía WhatsApp por Microservicio.')
+            messages.success(request, 'Vacuna registrada. Recordatorio preventivo preparado por el Microservicio de Notificaciones.')
+            _mensaje_whatsapp(request, notif)
         else:
             messages.success(request, 'Vacuna registrada correctamente.')
         if mascota:
@@ -154,7 +164,8 @@ def vacuna_notificar_microservicio(request, pk):
         fecha_limite=vacuna.fecha_proxima_dosis or vacuna.fecha_aplicacion
     )
     if resp and resp.get('success'):
-        messages.success(request, f"¡Alerta de vacuna para {vacuna.mascota.nombre} enviada por WhatsApp (Microservicio 8081)!")
+        messages.success(request, f"Alerta de vacuna para {vacuna.mascota.nombre} preparada por el Microservicio de Notificaciones (8081).")
+        _mensaje_whatsapp(request, resp)
     else:
         messages.warning(request, "No se pudo conectar con el Microservicio de Notificaciones. Inicie los microservicios con iniciar_microservicios.bat.")
     return redirect('vacuna_lista')

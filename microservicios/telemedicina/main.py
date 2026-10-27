@@ -179,6 +179,7 @@ SALA_HTML = """<!DOCTYPE html>
                     <button id="btnAudio" class="btn btn-secondary" onclick="toggleAudio()"><i class="fa-solid fa-microphone me-1"></i> Silenciar</button>
                     <button id="btnVideo" class="btn btn-secondary" onclick="toggleVideo()"><i class="fa-solid fa-video me-1"></i> Apagar video</button>
                     <button class="btn btn-danger" onclick="finalizar()"><i class="fa-solid fa-phone-slash me-1"></i> Finalizar Consulta</button>
+                    <select id="selCamara" class="form-select bg-dark text-white border-secondary w-auto d-none" onchange="cambiarCamara(this.value)" title="Elegir cámara"></select>
                 </div>
             </div>
 
@@ -270,6 +271,53 @@ SALA_HTML = """<!DOCTYPE html>
                 $('boxLocal').classList.add('activo');
             } else {
                 $('textoLocal').textContent = 'Cámara no disponible';
+            }
+        }
+
+        const ES_VIRTUAL = /obs|virtual|snap camera|manycam|xsplit|droidcam virtual/i;
+
+        async function prepararSelectorCamara() {
+            if (!navigator.mediaDevices.enumerateDevices) return;
+            const camaras = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+            const sel = $('selCamara');
+            sel.innerHTML = '';
+            camaras.forEach((c, i) => {
+                const op = document.createElement('option');
+                op.value = c.deviceId;
+                op.textContent = c.label || ('Cámara ' + (i + 1));
+                sel.appendChild(op);
+            });
+            if (camaras.length > 1) sel.classList.remove('d-none');
+
+            const actual = localStream && localStream.getVideoTracks()[0];
+            if (actual) {
+                const ajustes = actual.getSettings();
+                if (ajustes.deviceId) sel.value = ajustes.deviceId;
+                if (ES_VIRTUAL.test(actual.label)) {
+                    const real = camaras.find(c => !ES_VIRTUAL.test(c.label));
+                    if (real) await cambiarCamara(real.deviceId);
+                }
+            }
+        }
+
+        async function cambiarCamara(deviceId) {
+            try {
+                const nuevo = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: deviceId } } });
+                const pista = nuevo.getVideoTracks()[0];
+                if (!localStream) localStream = new MediaStream();
+                localStream.getVideoTracks().forEach(t => { localStream.removeTrack(t); t.stop(); });
+                localStream.addTrack(pista);
+                $('videoLocal').srcObject = localStream;
+                $('boxLocal').classList.add('activo');
+                $('selCamara').value = deviceId;
+                if (pc) {
+                    const emisor = pc.getSenders().find(x => x.track && x.track.kind === 'video');
+                    if (emisor) await emisor.replaceTrack(pista);
+                    else pc.addTrack(pista, localStream);
+                }
+                sistema('Cámara activa: ' + (pista.label || 'seleccionada'));
+            } catch (err) {
+                sistema('No se pudo cambiar a esa cámara (' + err.name + ').');
             }
         }
 
@@ -410,6 +458,7 @@ SALA_HTML = """<!DOCTYPE html>
         (async () => {
             prepararEtiquetas();
             await iniciarMedia();
+            await prepararSelectorCamara();
             conectarSocket();
         })();
     </script>

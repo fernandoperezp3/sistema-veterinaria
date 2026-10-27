@@ -102,6 +102,14 @@
                             class="btn btn-sm btn-outline-info flex-fill" style="font-size:11px;">
                             <i class="fa-solid fa-stethoscope me-1"></i>Historia
                         </a>
+                        <a href="{% url 'cita_crear' %}?mascota={{ mascota.pk }}&tipo=CONSULTA&teleconsulta=1"
+                            class="btn btn-sm btn-outline-info flex-fill" style="font-size:11px;" title="Agendar teleconsulta">
+                            <i class="fa-solid fa-video"></i>
+                        </a>
+                        <a href="{% url 'cita_crear' %}?mascota={{ mascota.pk }}&tipo=CONSULTA"
+                            class="btn btn-sm btn-outline-primary flex-fill" style="font-size:11px;">
+                            <i class="fa-solid fa-calendar-plus me-1"></i>Cita
+                        </a>
                         <a href="{% url 'vacuna_crear_mascota' mascota.pk %}"
                             class="btn btn-sm btn-outline-success flex-fill" style="font-size:11px;">
                             <i class="fa-solid fa-syringe me-1"></i>Vacuna

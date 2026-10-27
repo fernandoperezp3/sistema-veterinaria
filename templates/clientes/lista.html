@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <form class="d-flex gap-2" method="get">
         <input type="text" name="q" value="{{ q }}" class="form-control"
-            placeholder="Buscar por nombre, DNI o teléfono..." style="width:320px;">
+            placeholder="Buscar por nombre, DPI o teléfono..." style="width:320px;">
         <button type="submit" class="btn btn-primary px-4" style="background:#0bb8c8;border:none;">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
@@ -27,7 +27,7 @@
                 <tr
                     style="background:#f8fafc; font-size:12px; text-transform:uppercase; color:#94a3b8; letter-spacing:.5px;">
                     <th class="ps-3">Cliente</th>
-                    <th>DNI</th>
+                    <th>DPI</th>
                     <th>Teléfono</th>
                     <th>Email</th>
                     <th class="text-center">Mascotas</th>
@@ -45,7 +45,7 @@
                                 {{ cliente.nombres.0|upper }}
                             </div>
                             <div>
-                                <div class="fw-semibold text-dark">{{ cliente.nombre_completo }}</div>
+                                <div class="fw-semibold text-dark">{{ cliente.nombre_completo }}{% if cliente.usuario_id %} <span class="badge bg-info-subtle text-info border border-info-subtle ms-1" title="Se registró desde el portal con Google"><i class="fa-brands fa-google me-1"></i>Portal</span>{% endif %}</div>
                                 <small class="text-muted">{{ cliente.direccion|default:"-"|truncatechars:30 }}</small>
                             </div>
                         </div>

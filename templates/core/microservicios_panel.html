@@ -205,6 +205,58 @@
         </div>
     </div>
 
+    <div class="row g-4 mt-1">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold"><i class="fa-brands fa-whatsapp text-success me-2"></i>Últimas notificaciones (MS 8081)</h6>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm table-hover mb-0 small">
+                        <thead class="table-light"><tr><th>Fecha</th><th>Tipo</th><th>Destinatario</th><th></th></tr></thead>
+                        <tbody>
+                        {% for n in notificaciones %}
+                        <tr>
+                            <td class="text-nowrap">{{ n.fecha_envio }}</td>
+                            <td><span class="badge bg-{% if n.tipo == 'CITA' %}primary{% else %}warning text-dark{% endif %}">{{ n.tipo }}</span></td>
+                            <td>{{ n.destinatario }}<br><span class="text-muted">{{ n.telefono }}</span></td>
+                            <td>{% if n.enlace_whatsapp %}<a href="{{ n.enlace_whatsapp }}" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm py-0"><i class="fa-brands fa-whatsapp"></i></a>{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-3">Sin notificaciones desde que se iniciaron los microservicios.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold"><i class="fa-solid fa-file-invoice text-primary me-2"></i>Comprobantes electrónicos emitidos (MS 8082)</h6>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm table-hover mb-0 small">
+                        <thead class="table-light"><tr><th>Número</th><th>Cliente</th><th class="text-end">Total</th><th>Hash</th><th>Estado</th></tr></thead>
+                        <tbody>
+                        {% for c in comprobantes %}
+                        <tr>
+                            <td class="text-nowrap">{{ c.numero }}</td>
+                            <td>{{ c.cliente }}</td>
+                            <td class="text-end">{{ c.total|floatformat:2 }}</td>
+                            <td><code>{{ c.hash_cpe|truncatechars:12 }}</code></td>
+                            <td><span class="badge bg-success">{{ c.estado_sunat_sat }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-3">Sin comprobantes desde que se iniciaron los microservicios.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sección de Entregables de Arquitectura -->
     <div class="card border-0 shadow-sm mt-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">

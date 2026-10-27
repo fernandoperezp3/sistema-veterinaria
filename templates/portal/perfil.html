@@ -1,0 +1,28 @@
+{% extends 'portal/base_portal.html' %}
+{% block title %}Mis datos{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="tarjeta">
+            <h4 class="fw-bold mb-1">{% if nuevo %}Completa tu registro{% else %}Mis datos{% endif %}</h4>
+            <p class="text-muted">{% if nuevo %}Es la primera vez que entras. Con estos datos la clínica podrá encontrarte y asignarte citas.{% else %}Mantén tus datos actualizados.{% endif %}</p>
+            <form method="post">
+                {% csrf_token %}
+                {% include 'partials/form_errors.html' %}
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label fw-semibold">Nombres *</label>{{ form.nombres }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold">Apellidos *</label>{{ form.apellidos }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold">DPI / Documento *</label>{{ form.dni }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold">Teléfono *</label>{{ form.telefono }}</div>
+                    <div class="col-12"><label class="form-label fw-semibold">Dirección</label>{{ form.direccion }}</div>
+                    <div class="col-12 text-muted small"><i class="fa-brands fa-google me-1"></i>Correo: {{ request.user.email }}</div>
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-info text-white px-4"><i class="fa-solid fa-floppy-disk me-1"></i>Guardar</button>
+                    {% if not nuevo %}<a href="{% url 'portal_inicio' %}" class="btn btn-outline-secondary">Cancelar</a>{% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
