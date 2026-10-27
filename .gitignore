@@ -19,3 +19,6 @@ veterinaria/local_settings.py
 _respaldo_antes_de_revision/
 _to_delete/
 .vscode/
+
+# Llave privada del certificado HTTPS local
+nginx/certs/*.key

@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('django.contrib.auth.urls')),
     # OAuth / django-allauth
     path('accounts/', include('allauth.urls')),
+    path('portal/', include('apps.clientes.urls_portal')),
     path('clientes/', include('apps.clientes.urls')),
     path('agenda/', include('apps.agenda.urls')),
     path('medico/', include('apps.medico.urls')),

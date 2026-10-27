@@ -52,7 +52,7 @@ class FacturaRequest(BaseModel):
 class PagoTarjetaRequest(BaseModel):
     factura_numero: str
     monto: float
-    moneda: str = "PEN"
+    moneda: str = "GTQ"
     numero_tarjeta_enmascarado: str
     titular: str
     pasarela: str = "STRIPE"
@@ -77,8 +77,8 @@ def emitir_comprobante_fiscal(req: FacturaRequest):
     firma_digital = f"SIGN-{uuid.uuid4().hex[:16].upper()}"
     
     codigo_qr_data = (
-        f"RUC_CLINICA:20601234567|TIPO:{req.tipo_comprobante}|SERIE:{req.numero_factura}|"
-        f"IGV:{req.igv}|TOTAL:{req.total}|FECHA:{datetime.now().strftime('%Y-%m-%d')}|"
+        f"NIT_CLINICA:1234567-8|TIPO:{req.tipo_comprobante}|SERIE:{req.numero_factura}|"
+        f"IVA:{req.igv}|TOTAL:{req.total}|FECHA:{datetime.now().strftime('%Y-%m-%d')}|"
         f"DOC_CLIENTE:{req.cliente_documento}|HASH:{hash_cpe}"
     )
 

@@ -11,8 +11,8 @@ class Configuracion(models.Model):
     logo = models.ImageField(upload_to='configuracion/', blank=True, null=True)
     
     # Moneda
-    simbolo_moneda = models.CharField(max_length=10, default='S/', help_text='Ej: S/, $, €, Bs.')
-    nombre_moneda = models.CharField(max_length=50, default='Soles', blank=True)
+    simbolo_moneda = models.CharField(max_length=10, default='Q', help_text='Ej: Q, $, €')
+    nombre_moneda = models.CharField(max_length=50, default='Quetzales', blank=True)
 
     nombre_impuesto = models.CharField(max_length=20, default='IGV', help_text='Ej: IGV, IVA')
     porcentaje_impuesto = models.DecimalField(
@@ -22,7 +22,7 @@ class Configuracion(models.Model):
     )
     
     # Identificación fiscal
-    ruc = models.CharField(max_length=20, blank=True, null=True, verbose_name='RUC / RIF / NIT')
+    ruc = models.CharField(max_length=20, blank=True, null=True, verbose_name='NIT')
     
     # Contacto
     telefono = models.CharField(max_length=30, blank=True, null=True)

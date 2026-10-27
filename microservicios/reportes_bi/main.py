@@ -46,7 +46,7 @@ class BalanceRequest(BaseModel):
     total_ingresos: float
     total_egresos: float
     citas_atendidas: int
-    simbolo_moneda: str = "S/"
+    simbolo_moneda: str = "Q"
 
 @app.get("/health")
 def health_check():
@@ -93,7 +93,7 @@ def generar_pdf_tarea(filename: str, req: BalanceRequest):
     c.setFillColor(colors.HexColor("#0F172A"))
     c.setFont("Helvetica-Bold", 12)
     c.drawString(60, h - 235, "Concepto Económico")
-    c.drawString(350, h - 235, "Monto (PEN)")
+    c.drawString(350, h - 235, "Monto (GTQ)")
 
     c.setFont("Helvetica", 11)
     c.drawString(60, h - 260, "(+) Total Ingresos por Servicios y Ventas:")

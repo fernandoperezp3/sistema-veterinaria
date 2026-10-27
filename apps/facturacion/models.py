@@ -6,7 +6,7 @@ class Factura(models.Model):
     METODOS = (
         ('EFECTIVO', 'Efectivo'),
         ('TARJETA', 'Tarjeta (POS)'),
-        ('TRANSFERENCIA', 'Transferencia / Yape / Plin'),
+        ('TRANSFERENCIA', 'Transferencia'),
     )
     ESTADOS = (
         ('PAGADA', 'Pagada'),
@@ -21,6 +21,11 @@ class Factura(models.Model):
     metodo_pago = models.CharField(max_length=20, choices=METODOS, default='EFECTIVO')
     estado = models.CharField(max_length=20, choices=ESTADOS, default='PAGADA')
     cajero = models.CharField(max_length=100, blank=True, null=True)
+    hash_cpe = models.CharField(max_length=64, blank=True, default='', verbose_name='Hash del comprobante')
+    firma_digital = models.CharField(max_length=64, blank=True, default='')
+    estado_fiscal = models.CharField(max_length=20, blank=True, default='', verbose_name='Estado ante la entidad fiscal')
+    codigo_qr = models.TextField(blank=True, default='')
+    autorizacion_pago = models.CharField(max_length=40, blank=True, default='', verbose_name='Autorización de tarjeta')
 
     def __str__(self):
         return f"Factura #{self.numero} - {self.cliente}"

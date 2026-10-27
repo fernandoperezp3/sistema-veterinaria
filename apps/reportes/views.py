@@ -43,7 +43,7 @@ def reporte_clientes_pdf(request):
     story.append(Spacer(1, 0.5*cm))
 
     # Tabla
-    data = [['N°', 'Nombre', 'DNI', 'Teléfono', 'Email', 'Mascotas', 'Registro']]
+    data = [['N°', 'Nombre', 'DPI', 'Teléfono', 'Email', 'Mascotas', 'Registro']]
     for i, c in enumerate(clientes, 1):
         data.append([
             str(i),
@@ -257,9 +257,21 @@ def reporte_balance_microservicio(request):
             timeout=3.0
         )
         if res.status_code == 200:
-            data = res.json()
-            url_descarga = data['detalle']['url_descarga']
-            return redirect(url_descarga)
+            import time
+            from django.http import HttpResponse
+            filename = res.json()['detalle']['filename']
+            base = MicroservicesClient.SERVICES['reportes']['url']
+            # El worker genera el PDF en segundo plano: se espera a que esté listo
+            # y Django lo entrega (así funciona también desde otras PCs y por HTTPS).
+            for _ in range(20):
+                pdf = requests.get(f"{base}/api/v1/reportes/descargar/{filename}", timeout=3.0)
+                if pdf.status_code == 200 and pdf.content[:4] == b'%PDF':
+                    resp = HttpResponse(pdf.content, content_type='application/pdf')
+                    resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+                    return resp
+                time.sleep(0.25)
+            messages.warning(request, 'El reporte se está generando; inténtelo de nuevo en unos segundos.')
+            return redirect('reportes_index')
     except Exception:
         pass
         

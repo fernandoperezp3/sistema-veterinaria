@@ -1,5 +1,7 @@
 from pathlib import Path
+from urllib.parse import urlparse
 import os
+import socket
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,7 +11,10 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://localhost:8080', 'http://127.0.0.1:8080']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://localhost:8080', 'http://127.0.0.1:8080', 'https://localhost', 'https://127.0.0.1']
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = False
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -50,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'apps.clientes.middleware.PortalClienteMiddleware',
 ]
 
 ROOT_URLCONF = 'veterinaria.urls'
@@ -117,9 +123,44 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')
+
+
+def _redis_disponible(url):
+    try:
+        import redis
+        destino = urlparse(url)
+        with socket.create_connection((destino.hostname or '127.0.0.1', destino.port or 6379), timeout=0.3):
+            return True
+    except Exception:
+        return False
+
+
+REDIS_ACTIVO = _redis_disponible(REDIS_URL)
+
+if REDIS_ACTIVO:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+            'KEY_PREFIX': 'vetsystem',
+            'TIMEOUT': 300,
+        }
+    }
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'vetsystem',
+        }
+    }
+
 SILENCED_SYSTEM_CHECKS = ['models.W036']
 
 LOGIN_URL = '/login/'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 60 * 60 * 8
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 

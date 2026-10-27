@@ -1,5 +1,6 @@
 from django import forms
 from django.db import models
+from django.utils import timezone
 from apps.telemedicina.models import ConsultaVirtual
 from apps.agenda.models import Cita
 
@@ -18,9 +19,11 @@ class ConsultaVirtualForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Mostrar solo citas de tipo consulta y que sean futuras o del día
-        self.fields['cita'].queryset = Cita.objects.filter(tipo='CONSULTA', consulta_virtual__isnull=True).order_by('-fecha', '-hora')
-        
-        # Si se esta editando, hay que asegurar que la cita actual este en el queryset
+        hoy = timezone.localdate()
+        base = models.Q(tipo='CONSULTA', consulta_virtual__isnull=True, is_active=True, fecha__gte=hoy)
         if self.instance and self.instance.pk:
-            self.fields['cita'].queryset = Cita.objects.filter(models.Q(tipo='CONSULTA', consulta_virtual__isnull=True) | models.Q(pk=self.instance.cita_id)).order_by('-fecha', '-hora')
+            base = base | models.Q(pk=self.instance.cita_id)
+        self.fields['cita'].queryset = Cita.objects.filter(base).select_related('mascota__cliente').order_by('fecha', 'hora')
+        self.fields['cita'].label_from_instance = lambda c: (
+            f"{c.fecha:%d/%m/%Y} {c.hora:%H:%M} · {c.mascota.nombre} · {c.mascota.cliente.nombre_completo} · {c.motivo}"
+        )

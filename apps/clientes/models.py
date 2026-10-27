@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 class Cliente(models.Model):
@@ -9,6 +10,10 @@ class Cliente(models.Model):
     direccion = models.TextField(blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True, verbose_name='Activo')
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='cliente_perfil', verbose_name='Cuenta del portal',
+    )
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos}"
