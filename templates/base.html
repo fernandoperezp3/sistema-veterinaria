@@ -187,8 +187,15 @@
             {% if messages %}
             <div class="messages mb-4">
                 {% for message in messages %}
+                {% if 'whatsapp' in message.extra_tags %}
+                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-3" role="alert">
+                    <i class="fa-brands fa-whatsapp fs-3 text-success"></i>
+                    <div class="flex-grow-1">Mensaje listo para el cliente. Ábrelo y presiona <strong>Enviar</strong> en WhatsApp.</div>
+                    <a href="{{ message.message }}" target="_blank" rel="noopener" class="btn btn-success btn-sm rounded-pill"><i class="fa-brands fa-whatsapp me-1"></i>Enviar por WhatsApp</a>
+                {% else %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                     {{ message }}
+                {% endif %}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}

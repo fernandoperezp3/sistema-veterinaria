@@ -10,6 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
+from urllib.parse import quote
+import re
 import time
 
 app = FastAPI(
@@ -28,6 +30,16 @@ app.add_middleware(
 
 NOTIFICACIONES_LOG = []
 START_TIME = time.time()
+CODIGO_PAIS = "502"
+
+
+def enlace_whatsapp(telefono, mensaje):
+    numero = re.sub(r"\D", "", telefono or "")
+    if not numero or set(numero) == {"0"}:
+        return None
+    if len(numero) == 8:
+        numero = CODIGO_PAIS + numero
+    return f"https://wa.me/{numero}?text={quote(mensaje)}"
 
 class CitaNotificationRequest(BaseModel):
     cita_id: int
@@ -75,14 +87,15 @@ def notificar_cita(req: CitaNotificationRequest):
         "telefono": req.telefono,
         "canal": req.canal,
         "mensaje": mensaje,
-        "estado": "ENVIADO_EXITOSO",
+        "enlace_whatsapp": enlace_whatsapp(req.telefono, mensaje),
+        "estado": "PREPARADO",
         "fecha_envio": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     NOTIFICACIONES_LOG.append(registro)
     
     return {
         "success": True,
-        "mensaje": f"Notificación enviada exitosamente vía {req.canal}",
+        "mensaje": f"Notificación preparada para {req.canal}",
         "detalle": registro
     }
 
@@ -101,14 +114,15 @@ def notificar_vacuna(req: VacunaNotificationRequest):
         "telefono": req.telefono,
         "canal": "WHATSAPP",
         "mensaje": mensaje,
-        "estado": "ENVIADO_EXITOSO",
+        "enlace_whatsapp": enlace_whatsapp(req.telefono, mensaje),
+        "estado": "PREPARADO",
         "fecha_envio": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     NOTIFICACIONES_LOG.append(registro)
     
     return {
         "success": True,
-        "mensaje": "Alerta de vacunación despachada",
+        "mensaje": "Alerta de vacunación preparada para WhatsApp",
         "detalle": registro
     }
 
