@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Factura {{ factura.numero }}{% endblock %}
+
 {% block page_title %}Factura {{ factura.numero }}{% endblock %}
 {% block page_subtitle %}Detalle del comprobante{% endblock %}
 
@@ -28,7 +29,7 @@
                 <div class="col-md-6">
                     <p class="text-muted small mb-1">CLIENTE</p>
                     <div class="fw-semibold">{{ factura.cliente.nombre_completo|default:"Anónimo" }}</div>
-                    {% if factura.cliente %}<div class="text-muted small">DNI: {{ factura.cliente.dni }}</div>
+                    {% if factura.cliente %}<div class="text-muted small">DPI: {{ factura.cliente.dni }}</div>
                     <div class="text-muted small">Tel: {{ factura.cliente.telefono }}</div>{% endif %}
                 </div>
                 <div class="col-md-6 text-md-end">
@@ -74,27 +75,36 @@
                 </tfoot>
             </table>
 
-            <!-- Certificación Fiscal Electrónica (Microservicio Facturación) -->
             <div class="p-3 rounded mt-3" style="background:#f8fafc; border: 1px dashed #cbd5e1;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="badge bg-success"><i class="fa-solid fa-shield-halved me-1"></i> Comprobante Fiscal UBL 2.1</span>
-                    <small class="text-muted"><i class="fa-solid fa-server me-1"></i> Microservicio Facturación (Puerto 8082)</small>
+                    {% if factura.hash_cpe %}
+                    <span class="badge bg-success"><i class="fa-solid fa-shield-halved me-1"></i> Comprobante electrónico firmado</span>
+                    {% else %}
+                    <span class="badge bg-secondary"><i class="fa-solid fa-triangle-exclamation me-1"></i> Sin certificación electrónica</span>
+                    {% endif %}
+                    <small class="text-muted"><i class="fa-solid fa-server me-1"></i> Microservicio Facturación (8082)</small>
                 </div>
-                <div class="row g-2 align-items-center">
+                {% if factura.hash_cpe %}
+                <div class="row g-3 align-items-center">
                     <div class="col-auto">
-                        <div class="p-2 bg-white rounded border text-center shadow-sm" style="width: 65px; height: 65px; display:flex; align-items:center; justify-content:center;">
-                            <i class="fa-solid fa-qrcode fa-2x text-dark"></i>
-                        </div>
+                        <div id="qrFactura" class="p-2 bg-white rounded border shadow-sm"></div>
                     </div>
                     <div class="col">
-                        <div class="small text-muted mb-0">Hash Criptográfico SHA-256:</div>
-                        <code class="small text-primary fw-semibold" style="word-break: break-all;">CPE-SHA256-{{ factura.numero }}-{{ factura.total }}-SECURE</code>
+                        <div class="small text-muted">Hash SHA-256:</div>
+                        <code class="small text-primary fw-semibold" style="word-break: break-all;">{{ factura.hash_cpe }}</code>
+                        <div class="small text-muted mt-1">Firma digital: <code>{{ factura.firma_digital }}</code></div>
                         <div class="small text-secondary mt-1">
                             <i class="fa-solid fa-circle-check text-success me-1"></i>
-                            Estado Tributario: <strong>ACEPTADO / SUNAT</strong> | XML Firmado Digitalmente
+                            Estado fiscal: <strong>{{ factura.estado_fiscal|default:"—" }}</strong>
                         </div>
+                        {% if factura.autorizacion_pago %}
+                        <div class="small text-secondary mt-1"><i class="fa-solid fa-credit-card text-info me-1"></i>Pago con tarjeta autorizado: <strong>{{ factura.autorizacion_pago }}</strong></div>
+                        {% endif %}
                     </div>
                 </div>
+                {% else %}
+                <div class="small text-muted">El microservicio fiscal no estaba disponible cuando se emitió esta factura.</div>
+                {% endif %}
             </div>
         </div>
 
@@ -110,4 +120,17 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if factura.codigo_qr %}
+{{ factura.codigo_qr|json_script:"qr-data" }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    new QRCode(document.getElementById('qrFactura'), {
+        text: JSON.parse(document.getElementById('qr-data').textContent),
+        width: 96, height: 96, correctLevel: QRCode.CorrectLevel.L
+    });
+</script>
+{% endif %}
 {% endblock %}
