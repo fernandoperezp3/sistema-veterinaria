@@ -22,6 +22,13 @@ def _enlace_sala(cita, request):
     return enlace
 
 
+def _ocultar_correo(correo):
+    if not correo or '@' not in correo:
+        return 'otra cuenta'
+    usuario, dominio = correo.split('@', 1)
+    return f"{usuario[:3]}***@{dominio}"
+
+
 def _cliente_de(user):
     cliente = getattr(user, 'cliente_perfil', None)
     if cliente:
@@ -77,6 +84,18 @@ def portal_perfil(request):
             'nombres': request.user.first_name,
             'apellidos': request.user.last_name,
         }
+    if request.method == 'POST' and not cliente:
+        existente = Cliente.objects.filter(dni=(request.POST.get('dni') or '').strip()).select_related('usuario').first()
+        if existente and existente.usuario_id and existente.usuario_id != request.user.id:
+            messages.error(
+                request,
+                f'Ese DPI ya está registrado con otra cuenta de Google ({_ocultar_correo(existente.usuario.email)}). '
+                'Cierra sesión y entra con esa cuenta para ver tus mascotas y citas.'
+            )
+            form = PerfilClienteForm(request.POST)
+            return render(request, 'portal/perfil.html', {'form': form, 'nuevo': True})
+        if existente:
+            cliente = existente
     form = PerfilClienteForm(request.POST or None, instance=cliente, initial=inicial)
     if form.is_valid():
         nuevo = form.save(commit=False)
