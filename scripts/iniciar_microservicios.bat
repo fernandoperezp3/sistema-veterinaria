@@ -1,6 +1,6 @@
 @echo off
 title Orquestador de Microservicios VetSystem
-cd /d "%~dp0"
+cd /d "%~dp0.."
 echo ========================================================
 echo       ENCENDIENDO ARQUITECTURA DE MICROSERVICIOS
 echo ========================================================

@@ -1,6 +1,7 @@
 @echo off
 title VetSystem - Lanzador del Sistema Completo
-cd /d "%~dp0"
+cd /d "%~dp0.."
+set "ROOT=%CD%"
 echo ======================================================================
 echo          VETSYSTEM - SISTEMA VETERINARIO ^& MICROSERVICIOS
 echo ======================================================================
@@ -43,12 +44,12 @@ if errorlevel 1 (
 %PY% manage.py shell -c "from django.contrib.sessions.models import Session; Session.objects.all().delete(); from django.core.cache import cache; cache.clear()" >nul 2>&1
 
 echo [4/6] Iniciando los 4 Microservicios (Puertos 8081, 8082, 8083, 8084)...
-start "VetSystem - Microservicios" cmd /k "iniciar_microservicios.bat"
+start "VetSystem - Microservicios" cmd /k "scripts\iniciar_microservicios.bat"
 timeout /t 3 /nobreak >nul
 
 echo [5/6] Iniciando gateway Nginx HTTPS (puertos 80 y 443)...
 docker rm -f vetsystem_gateway >nul 2>&1
-docker run -d --name vetsystem_gateway --restart unless-stopped -p 80:80 -p 443:443 --add-host=host.docker.internal:host-gateway -v "%~dp0nginx\lan.conf:/etc/nginx/conf.d/default.conf:ro" -v "%~dp0nginx\certs:/etc/nginx/certs:ro" nginx:alpine >nul
+docker run -d --name vetsystem_gateway --restart unless-stopped -p 80:80 -p 443:443 --add-host=host.docker.internal:host-gateway -v "%ROOT%\nginx\lan.conf:/etc/nginx/conf.d/default.conf:ro" -v "%ROOT%\nginx\certs:/etc/nginx/certs:ro" nginx:alpine >nul
 if errorlevel 1 (
     echo    No se pudo iniciar Nginx. Verifique que Docker Desktop este abierto.
     set "URL=http://127.0.0.1:8080/login/"

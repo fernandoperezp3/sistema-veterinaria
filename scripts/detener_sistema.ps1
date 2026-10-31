@@ -1,4 +1,4 @@
-$ruta = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ruta = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $venv = Join-Path $ruta 'venv'
 $procesos = Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
     Where-Object { $_.ExecutablePath -and $_.ExecutablePath.StartsWith($venv, [System.StringComparison]::OrdinalIgnoreCase) }

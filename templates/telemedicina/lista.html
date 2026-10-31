@@ -94,16 +94,23 @@
                                     <div class="btn-group">
                                         {% if c.enlace_reunion and c.estado_conexion != 'FINALIZADA' %}
                                         {% if '8083' in c.enlace_reunion %}
-                                        <a href="{% if request.is_secure %}{{ c.enlace_reunion|cut:"http://127.0.0.1:8083" }}{% else %}{{ c.enlace_reunion }}{% endif %}?rol=vet" target="_blank"
+                                        <a href="{{ c.link_vet }}" target="_blank"
                                             class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
                                             title="Unirse a la videollamada como veterinario">
                                             <i class="fas fa-user-md"></i> Entrar
                                         </a>
-                                        <a href="{% if request.is_secure %}{{ c.enlace_reunion|cut:"http://127.0.0.1:8083" }}{% else %}{{ c.enlace_reunion }}{% endif %}?rol=cliente" target="_blank"
-                                            class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip"
-                                            title="Enlace para el dueño de la mascota (clic derecho para copiar)">
-                                            <i class="fas fa-paw"></i> Dueño
+                                        <button type="button" class="btn btn-sm btn-outline-warning btn-copiar-enlace"
+                                            data-enlace="{{ c.link_cliente }}" data-bs-toggle="tooltip"
+                                            title="Copiar el enlace para el dueño: {{ c.link_cliente }}">
+                                            <i class="fas fa-copy"></i> Copiar enlace
+                                        </button>
+                                        {% if c.link_whatsapp %}
+                                        <a href="{{ c.link_whatsapp }}" target="_blank" rel="noopener"
+                                            class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip"
+                                            title="Enviar el enlace al dueño por WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
                                         </a>
+                                        {% endif %}
                                         {% else %}
                                         <a href="{{ c.enlace_reunion }}" target="_blank"
                                             class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
@@ -198,4 +205,25 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.btn-copiar-enlace').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var enlace = btn.dataset.enlace;
+        var listo = function () {
+            var original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+            btn.classList.replace('btn-outline-warning', 'btn-success');
+            setTimeout(function () { btn.innerHTML = original; btn.classList.replace('btn-success', 'btn-outline-warning'); }, 2000);
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(enlace).then(listo, function () { window.prompt('Copie el enlace:', enlace); });
+        } else {
+            window.prompt('Copie el enlace:', enlace);
+        }
+    });
+});
+</script>
 {% endblock %}

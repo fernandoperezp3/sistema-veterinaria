@@ -16,6 +16,20 @@ def telemedicina_lista(request):
     # Citas tipo consulta que aún no tienen teleconsulta asociada (posibles futuras teleconsultas)
     citas_sin_telemedicina = Cita.objects.filter(tipo='CONSULTA', consulta_virtual__isnull=True, fecha__gte=hoy).order_by('fecha', 'hora')
     
+    from apps.core.red import enlace_sala_publico, enlace_whatsapp, ruta_sala
+    consultas = list(consultas)
+    for c in consultas:
+        if ruta_sala(c.enlace_reunion):
+            c.link_vet = enlace_sala_publico(request, c.enlace_reunion, 'vet')
+            c.link_cliente = enlace_sala_publico(request, c.enlace_reunion, 'cliente')
+            cliente = c.cita.mascota.cliente
+            mensaje = (
+                f"Hola {cliente.nombres}, este es el enlace para la videoconsulta de {c.cita.mascota.nombre} "
+                f"el {c.cita.fecha:%d/%m/%Y} a las {c.cita.hora:%H:%M}: {c.link_cliente} "
+                f"(si aparece un aviso de seguridad, elija Avanzado y luego Continuar)."
+            )
+            c.link_whatsapp = enlace_whatsapp(cliente.telefono, mensaje)
+
     return render(request, 'telemedicina/lista.html', {
         'consultas': consultas,
         'citas_pendientes': citas_sin_telemedicina,
@@ -42,6 +56,22 @@ def telemedicina_crear(request):
                 consulta.codigo_acceso = resp_sala['sala']['sala_id']
         consulta.save()
         messages.success(request, 'Teleconsulta programada (Sala WebRTC generada por Microservicio).')
+        from apps.core.red import enlace_sala_publico, ruta_sala
+        if ruta_sala(consulta.enlace_reunion):
+            from apps.agenda.views import _mensaje_whatsapp
+            from apps.core.services_client import MicroservicesClient
+            cita = consulta.cita
+            notif = MicroservicesClient.notificar_cita(
+                cita_id=cita.id,
+                cliente_nombre=cita.mascota.cliente.nombre_completo,
+                telefono=cita.mascota.cliente.telefono,
+                mascota_nombre=cita.mascota.nombre,
+                fecha=cita.fecha,
+                hora=cita.hora,
+                motivo=getattr(cita, 'motivo', 'Consulta General'),
+                enlace_videollamada=enlace_sala_publico(request, consulta.enlace_reunion, 'cliente'),
+            )
+            _mensaje_whatsapp(request, notif)
         return redirect('telemedicina_lista')
         
     cita_id = request.GET.get('cita')

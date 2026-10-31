@@ -1,6 +1,6 @@
 @echo off
 title VetSystem - Instalacion
-cd /d "%~dp0"
+cd /d "%~dp0.."
 echo ======================================================================
 echo          VETSYSTEM - INSTALACION DE DEPENDENCIAS
 echo ======================================================================
@@ -27,5 +27,5 @@ if errorlevel 1 (
 echo [4/4] Aplicando migraciones (MySQL debe estar encendido)...
 venv\Scripts\python.exe manage.py migrate
 echo.
-echo Instalacion terminada. Ejecute iniciar_sistema_completo.bat
+echo Instalacion terminada. Ejecute scripts\iniciar_sistema_completo.bat
 pause

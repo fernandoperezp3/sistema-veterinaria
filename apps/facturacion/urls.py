@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.factura_lista, name='factura_lista'),
     path('nueva/', views.factura_crear, name='factura_crear'),
     path('<int:pk>/', views.factura_detalle, name='factura_detalle'),
+    path('<int:pk>/pdf/', views.factura_pdf, name='factura_pdf'),
     path('<int:pk>/anular/', views.factura_anular, name='factura_anular'),
     # Caja
     path('caja/', views.caja_hoy, name='caja_hoy'),
