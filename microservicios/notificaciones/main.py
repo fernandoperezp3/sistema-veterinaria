@@ -51,6 +51,7 @@ class CitaNotificationRequest(BaseModel):
     hora: str
     motivo: Optional[str] = "Consulta General"
     canal: Optional[str] = "WHATSAPP"
+    enlace_videollamada: Optional[str] = None
 
 class VacunaNotificationRequest(BaseModel):
     vacuna_id: int
@@ -74,14 +75,22 @@ def health_check():
 
 @app.post("/api/v1/notificaciones/cita")
 def notificar_cita(req: CitaNotificationRequest):
-    mensaje = (
-        f"Hola {req.cliente_nombre}, le recordamos la cita para su mascota {req.mascota_nombre} "
-        f"el día {req.fecha} a las {req.hora} en Clínica VetSystem. Motivo: {req.motivo}."
-    )
+    if req.enlace_videollamada:
+        mensaje = (
+            f"Hola {req.cliente_nombre}, le recordamos la videoconsulta de su mascota {req.mascota_nombre} "
+            f"el día {req.fecha} a las {req.hora} con Clínica VetSystem. Motivo: {req.motivo}. "
+            f"Ingrese a la videollamada aquí: {req.enlace_videollamada} "
+            f"(si aparece un aviso de seguridad, elija Avanzado y luego Continuar)."
+        )
+    else:
+        mensaje = (
+            f"Hola {req.cliente_nombre}, le recordamos la cita para su mascota {req.mascota_nombre} "
+            f"el día {req.fecha} a las {req.hora} en Clínica VetSystem. Motivo: {req.motivo}."
+        )
     
     registro = {
         "id": len(NOTIFICACIONES_LOG) + 1,
-        "tipo": "CITA",
+        "tipo": "TELECONSULTA" if req.enlace_videollamada else "CITA",
         "cita_id": req.cita_id,
         "destinatario": req.cliente_nombre,
         "telefono": req.telefono,

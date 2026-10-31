@@ -50,6 +50,14 @@ def agenda_lista(request):
     return render(request, 'agenda/lista.html', context)
 
 
+def _enlace_teleconsulta(request, cita):
+    from apps.core.red import enlace_sala_publico, ruta_sala
+    consulta = getattr(cita, 'consulta_virtual', None)
+    if not consulta or consulta.estado_conexion in ('FINALIZADA', 'CANCELADA') or not ruta_sala(consulta.enlace_reunion):
+        return None
+    return enlace_sala_publico(request, consulta.enlace_reunion, 'cliente')
+
+
 def _crear_teleconsulta(cita):
     from apps.core.services_client import MicroservicesClient
     from apps.telemedicina.models import ConsultaVirtual
@@ -104,7 +112,8 @@ def cita_crear(request):
             mascota_nombre=cita.mascota.nombre,
             fecha=cita.fecha,
             hora=cita.hora,
-            motivo=getattr(cita, 'motivo', 'Consulta General')
+            motivo=getattr(cita, 'motivo', 'Consulta General'),
+            enlace_videollamada=_enlace_teleconsulta(request, cita),
         )
         if notif:
             messages.success(request, f'Cita registrada para {cita.mascota.nombre} el {cita.fecha}. Recordatorio preparado por el Microservicio de Notificaciones.')
@@ -167,7 +176,8 @@ def cita_notificar_microservicio(request, pk):
         mascota_nombre=cita.mascota.nombre,
         fecha=cita.fecha,
         hora=cita.hora,
-        motivo=getattr(cita, 'motivo', 'Consulta General')
+        motivo=getattr(cita, 'motivo', 'Consulta General'),
+        enlace_videollamada=_enlace_teleconsulta(request, cita),
     )
     if resp and resp.get('success'):
         messages.success(request, f'Recordatorio de la cita de {cita.mascota.nombre} preparado por el Microservicio de Notificaciones (8081).')

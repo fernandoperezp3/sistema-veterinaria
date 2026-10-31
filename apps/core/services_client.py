@@ -77,7 +77,7 @@ class MicroservicesClient:
         return estados
 
     @classmethod
-    def notificar_cita(cls, cita_id, cliente_nombre, telefono, mascota_nombre, fecha, hora, motivo):
+    def notificar_cita(cls, cita_id, cliente_nombre, telefono, mascota_nombre, fecha, hora, motivo, enlace_videollamada=None):
         """Envía petición asíncrona al Microservicio de Notificaciones."""
         payload = {
             "cita_id": cita_id,
@@ -87,7 +87,8 @@ class MicroservicesClient:
             "fecha": fecha.strftime("%d/%m/%Y") if hasattr(fecha, "strftime") else str(fecha),
             "hora": hora.strftime("%H:%M") if hasattr(hora, "strftime") else str(hora)[:5],
             "motivo": motivo or "Consulta General",
-            "canal": "WHATSAPP"
+            "canal": "WHATSAPP",
+            "enlace_videollamada": enlace_videollamada,
         }
         try:
             res = requests.post(f"{cls.SERVICES['notificaciones']['url']}/api/v1/notificaciones/cita", json=payload, timeout=2.0)
