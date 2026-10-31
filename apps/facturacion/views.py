@@ -304,3 +304,113 @@ def api_producto_precio(request, pk):
         'precio': float(producto.precio_venta),
         'stock': producto.stock_actual,
     })
+
+
+@login_required
+def factura_pdf(request, pk):
+    import io
+    from django.http import HttpResponse
+    from reportlab.graphics.barcode.qr import QrCodeWidget
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.units import cm
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+    factura = get_object_or_404(Factura.objects.select_related('cliente').prefetch_related('detalles'), pk=pk)
+    config = Configuracion.get_config()
+    moneda = config.simbolo_moneda
+    acento = colors.HexColor('#0bb8c8')
+    gris = colors.HexColor('#64748b')
+
+    def dinero(valor):
+        return f"{moneda} {valor:,.2f}"
+
+    normal = ParagraphStyle('n', fontName='Helvetica', fontSize=9.5, leading=13)
+    pequeno = ParagraphStyle('p', parent=normal, fontSize=8, textColor=gris, leading=11)
+    titulo = ParagraphStyle('t', parent=normal, fontName='Helvetica-Bold', fontSize=18, textColor=acento, leading=22)
+    derecha = ParagraphStyle('d', parent=normal, alignment=2)
+    derecha_b = ParagraphStyle('db', parent=derecha, fontName='Helvetica-Bold', fontSize=14, leading=18)
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, leftMargin=1.8 * cm, rightMargin=1.8 * cm,
+                            topMargin=1.5 * cm, bottomMargin=1.5 * cm,
+                            title=f"Factura {factura.numero}", author=config.nombre_empresa or 'VetSystem')
+    ancho = letter[0] - 3.6 * cm
+    elementos = []
+
+    empresa = [Paragraph((config.nombre_empresa or 'VetSystem').upper(), titulo)]
+    for dato in (config.ruc and f"NIT: {config.ruc}", config.direccion, config.telefono and f"Tel: {config.telefono}"):
+        if dato:
+            empresa.append(Paragraph(str(dato), pequeno))
+    cabecera_der = [
+        Paragraph(f"<b>FACTURA {factura.numero}</b>", derecha_b),
+        Paragraph(factura.fecha.astimezone(timezone.get_current_timezone()).strftime('%d/%m/%Y %H:%M'), ParagraphStyle('f', parent=derecha, textColor=gris)),
+        Paragraph(f"Estado: <b>{factura.get_estado_display()}</b>", derecha),
+    ]
+    cab = Table([[empresa, cabecera_der]], colWidths=[ancho * 0.55, ancho * 0.45])
+    cab.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'), ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#e2e8f0')),
+                             ('BOTTOMPADDING', (0, 0), (-1, -1), 10)]))
+    elementos += [cab, Spacer(1, 12)]
+
+    cliente = factura.cliente
+    datos_cliente = [Paragraph('<font color="#64748b" size="8">CLIENTE</font>', normal),
+                     Paragraph(f"<b>{cliente.nombre_completo if cliente else 'Consumidor final'}</b>", normal)]
+    if cliente:
+        datos_cliente += [Paragraph(f"DPI: {cliente.dni}", pequeno), Paragraph(f"Tel: {cliente.telefono}", pequeno)]
+    datos_pago = [Paragraph('<font color="#64748b" size="8">MÉTODO DE PAGO</font>', derecha),
+                  Paragraph(f"<b>{factura.get_metodo_pago_display()}</b>", derecha),
+                  Paragraph(f"Cajero: {factura.cajero or '—'}", ParagraphStyle('c', parent=pequeno, alignment=2))]
+    info = Table([[datos_cliente, datos_pago]], colWidths=[ancho * 0.6, ancho * 0.4])
+    info.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+    elementos += [info, Spacer(1, 14)]
+
+    filas = [['Descripción', 'Cant.', 'Precio unit.', 'Subtotal']]
+    for d in factura.detalles.all():
+        filas.append([Paragraph(d.descripcion, normal), str(d.cantidad), dinero(d.precio_unitario), dinero(d.subtotal)])
+    n = len(filas)
+    filas += [['', '', 'Subtotal', dinero(factura.subtotal)],
+              ['', '', config.nombre_impuesto or 'IVA', dinero(factura.igv)],
+              ['', '', 'TOTAL', dinero(factura.total)]]
+    tabla = Table(filas, colWidths=[ancho * 0.52, ancho * 0.1, ancho * 0.19, ancho * 0.19], repeatRows=1)
+    tabla.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), ('FONTSIZE', (0, 0), (-1, -1), 9.5),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f1f5f9')), ('TEXTCOLOR', (0, 0), (-1, 0), gris),
+        ('ALIGN', (1, 0), (-1, -1), 'RIGHT'), ('ALIGN', (1, 0), (1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LINEBELOW', (0, 0), (-1, n - 1), 0.5, colors.HexColor('#e2e8f0')),
+        ('LINEABOVE', (2, n), (-1, n), 0.8, colors.HexColor('#cbd5e1')),
+        ('FONTNAME', (2, -1), (-1, -1), 'Helvetica-Bold'), ('FONTSIZE', (2, -1), (-1, -1), 12),
+        ('TEXTCOLOR', (3, -1), (3, -1), colors.HexColor('#059669')),
+        ('TOPPADDING', (0, 0), (-1, -1), 6), ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elementos += [tabla, Spacer(1, 18)]
+
+    if factura.hash_cpe:
+        tam = 3.2 * cm
+        qr = QrCodeWidget(factura.codigo_qr or factura.hash_cpe)
+        x1, y1, x2, y2 = qr.getBounds()
+        dibujo = Drawing(tam, tam, transform=[tam / (x2 - x1), 0, 0, tam / (y2 - y1), 0, 0])
+        dibujo.add(qr)
+        lineas = [Paragraph('<b>Comprobante electrónico firmado</b>', normal),
+                  Paragraph(f"Hash SHA-256: <font face='Courier'>{factura.hash_cpe}</font>", pequeno),
+                  Paragraph(f"Firma digital: <font face='Courier'>{factura.firma_digital}</font>", pequeno),
+                  Paragraph(f"Estado fiscal: <b>{factura.estado_fiscal or '—'}</b>", pequeno)]
+        if factura.autorizacion_pago:
+            lineas.append(Paragraph(f"Pago con tarjeta autorizado: <b>{factura.autorizacion_pago}</b>", pequeno))
+        fiscal = Table([[dibujo, lineas]], colWidths=[tam + 0.6 * cm, ancho - tam - 0.6 * cm])
+        fiscal.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                    ('BOX', (0, 0), (-1, -1), 0.6, colors.HexColor('#cbd5e1')),
+                                    ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8fafc')),
+                                    ('TOPPADDING', (0, 0), (-1, -1), 8), ('BOTTOMPADDING', (0, 0), (-1, -1), 8)]))
+        elementos.append(fiscal)
+    else:
+        elementos.append(Paragraph('Comprobante sin certificación electrónica.', pequeno))
+
+    elementos += [Spacer(1, 20), Paragraph('Gracias por su preferencia.', ParagraphStyle('g', parent=pequeno, alignment=1))]
+    doc.build(elementos)
+
+    respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    modo = 'attachment' if request.GET.get('descargar') else 'inline'
+    respuesta['Content-Disposition'] = f'{modo}; filename="Factura_{factura.numero}.pdf"'
+    return respuesta
