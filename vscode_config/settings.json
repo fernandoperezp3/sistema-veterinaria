@@ -1,10 +1,30 @@
 {
     "python.defaultInterpreterPath": "${workspaceFolder}\\venv\\Scripts\\python.exe",
     "python.terminal.activateEnvironment": true,
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ],
     "files.exclude": {
         "**/__pycache__": true,
         "**/*.pyc": true,
-        ".venv": true
+        ".venv": true,
+        "venv": true,
+        "backups": true,
+        "media": true,
+        "staticfiles": true,
+        "vscode_config": true,
+        "microservicios/reportes_bi/generados": true,
+        "nginx/certs": true,
+        "*.pdf": true,
+        "*.png": true,
+        "*.drawio": true,
+        "*.sql": true,
+        "bd.md": true,
+        "arquitectura_vetsystem.html": true,
+        "documentacion.html": true,
+        "documentacion.md": true,
+        "generate_diagrams.py": true,
+        "static/arquitectura_vetsystem.*": true
     },
     "search.exclude": {
         "venv": true,

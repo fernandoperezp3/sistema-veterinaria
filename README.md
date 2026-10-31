@@ -11,7 +11,7 @@ Django 6 + MySQL + 4 microservicios FastAPI (8081–8084).
 ## Instalación (una sola vez)
 
 1. Encender MySQL.
-2. Ejecutar `instalar.bat` (crea `venv`, instala dependencias y aplica migraciones).
+2. Ejecutar `scripts\instalar.bat` (crea `venv`, instala dependencias y aplica migraciones).
 3. Crear el administrador:
    ```
    venv\Scripts\python manage.py createsuperuser
@@ -23,12 +23,12 @@ Django 6 + MySQL + 4 microservicios FastAPI (8081–8084).
 
 ## Ejecutar
 
-- `iniciar_sistema_completo.bat` → microservicios + Django y abre http://127.0.0.1:8080
+- `scripts\iniciar_sistema_completo.bat` → microservicios + Django y abre http://127.0.0.1:8080
 - Desde VS Code: panel *Run and Debug* → **Sistema completo (Django + Microservicios)**
 
 ## VS Code
 
-Ejecutar una vez `configurar_vscode.bat` (copia `vscode_config\*.json` a `.vscode`).
+Ejecutar una vez `scripts\configurar_vscode.bat` (copia `vscode_config\*.json` a `.vscode`).
 Luego abrir la carpeta en VS Code: el intérprete queda en `venv\Scripts\python.exe`
 (si no, `Ctrl+Shift+P` → *Python: Select Interpreter* → `venv`).
 
